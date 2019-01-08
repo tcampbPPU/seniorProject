@@ -8,6 +8,7 @@
 ## Usage</h1> </center>
 
 ## Contributors
+* Tanner Campbell
+* Edwin Obuya
 * Abi Subedi
-
-
+* Sheree Good
