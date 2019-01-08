@@ -8,5 +8,6 @@
 ## Usage</h1> </center>
 
 ## Contributors
-* Tanner Campbell
+* Abi Subedi
+
 
