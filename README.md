@@ -9,4 +9,5 @@
 
 ## Contributors
 * Tanner Campbell
+* Sheree Good
 * Edwin Obuya
