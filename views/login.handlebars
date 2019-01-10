@@ -1,0 +1,32 @@
+<style>
+  #header {
+    margin-top: 10pt;
+  }
+  .b {
+    border: 1px solid black;
+    background: rgba(13,13,13,.6);
+    box-shadow: 0px 10px 50px black;
+  }
+</style>
+<body>
+  <center>
+    <h3 id="header">Welcome to the Point Park University Tutoring Center!</h3><br><br>
+    <div class="container b">
+      <form action="login"  method="POST" id="login">
+        <div class="form-group col-md-6">
+          <label for="user">Point Park Username.</label>
+          <input type="text" name ="text"class="form-control" id="user" placeholder="Enter PPU username">
+        </div>
+        <div class="form-group col-md-6">
+          <label for="password1">Point Park Password.</label>
+          <input type="password" name ="password" class="form-control" id="password1" placeholder="Password">
+        </div>
+        <a href="mailto:tutoring@pointpark.edu?subject=Login Assistance Required&body=Hello I am having Trouble logining into Point Park Tutor Track.">Having Trouble Signing In?</a>
+        <br><br>
+        <div class="form-group col-md-6">
+          <input type="submit" class="btn primary" id="submit_btn" value="Login" style='color:black; font-weight:bold; background-color:white;'> <br>
+        </div>
+      </form>
+      <br>
+    </div>
+</body>
