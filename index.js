@@ -49,6 +49,7 @@ app.use(require('express-session')({
 
 /* DB Connection
  * USE connect(function(con){}); inside POST to call DB
+ */
 function connect(cb) {
   try {
     var con = mysql.createConnection({
@@ -84,7 +85,6 @@ function connect(cb) {
     }
   });
 }
-*/
 
 // To show current user specific nav tools. Will add privileges later...
 function getMenu(req) {
