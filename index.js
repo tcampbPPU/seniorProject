@@ -3,8 +3,6 @@ var express = require('express');
 var expressValidator = require('express-validator');
 var mysql = require('mysql');
 var fs = require('fs');
-var mysql = require('mysql');
-var app = express();
 var crypto = require('crypto');
 var handlebars = require('express-handlebars').create({defaultLayout: "main"});
 var credentials = require('./credentials.js');
@@ -42,14 +40,14 @@ app.use(require('body-parser').urlencoded({extended: true}));
 app.use(expressValidator());
 app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({
- resave:false,
- saveUninitialized:false,
- secret:credentials.cookieSecret
+ resave: false,
+ saveUninitialized: false,
+ secret: credentials.cookieSecret
 }));
 
 /* DB Connection
  * USE connect(function(con){}); inside POST to call DB
- */
+*/
 function connect(cb) {
   try {
     var con = mysql.createConnection({
@@ -63,7 +61,7 @@ function connect(cb) {
     console.log("ERROR: connect: mysql.createConnection(): " + e);
   }
   con.connect(function(err) {
-    if (err){
+    if (err) {
       console.log("ERROR: connect: con.connect(): " + err);
     }
     else {
@@ -81,7 +79,7 @@ function connect(cb) {
         catch (e) {
           console.log("ERROR: connect: con.end(): " + e);
         }
-      }, 60*1000);
+      }, 60 * 1000);
     }
   });
 }
@@ -89,7 +87,7 @@ function connect(cb) {
 // To show current user specific nav tools. Will add privileges later...
 function getMenu(req) {
   var menu = [];
-   menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student/Tutor-Toggle"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student/Tutor-Toggle"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
   return menu;
 };
 
