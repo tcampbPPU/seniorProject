@@ -87,7 +87,7 @@ function connect(cb) {
 // To show current user specific nav tools. Will add privileges later...
 function getMenu(req) {
   var menu = [];
-  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student/Tutor-Toggle"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student View"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
   return menu;
 };
 

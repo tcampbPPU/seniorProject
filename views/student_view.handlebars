@@ -1,3 +1,135 @@
+<style media="screen">
+
+  .container-fluid {
+    margin-left: 100px;
+    padding: inherit;
+  }
+
+  .weekDays-selector input {
+    display: none!important;
+  }
+
+  .weekDays-selector input[type=checkbox] + label {
+    display: inline-block;
+    border-radius: 8px;
+    background: #dddddd;
+    height: 40px;
+    width: 35px;
+    margin-right: 3px;
+    line-height: 40px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .weekDays-selector input[type=checkbox]:checked + label {
+    background: #2AD705;
+    color: #ffffff;
+  }
+
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- Stuff for time range slider bar -->
+<link rel="stylesheet" href="https://www.cssscript.com/demo/animated-customizable-range-slider-pure-javascript-rslider-js/css/rSlider.min.css">
+<script src="https://www.cssscript.com/demo/animated-customizable-range-slider-pure-javascript-rslider-js/js/rSlider.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    // init
+    timeBar();
+
+    function timeBar() {
+      var timeSlider = new rSlider({
+        target: '#time_range',
+        values: ['8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM' ],
+        step: 15,
+        range: true,
+        set: ['11:00 AM', '2:00 PM'],
+        tooltip: true, // shows current vals
+        scale: false,
+        labels: false,
+        width: null // not sure what other value goes here
+        // onChange: function (vals) {console.log(vals);}
+        // console.log(timeSlider.getValue());
+      });
+    }
+
+    $('#find_tutor').on('submit', function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'post',
+        url:'find_tutor',
+        data: $(this).serialize(), // time range data might looked wierd..
+        success: function(response) {
+          if (response.success) {
+            // console.log("Tutor Found");
+            // TODO: possibly create a dynamic tutor that loads all the tutors found in search
+                  // Then make each tutor clickable, open modal for student to schedule with them...
+                  // .. 
+          }else{
+            // console.log("Error! Unable to find tutor, or none available from search");
+          }
+        }
+      });
+    });
+
+
+  });
+</script>
 <body>
-  <center><h3>Get Connected with a Tutor</h3> <br>
-</body>
+  <div class="bootstrap-iso">
+   <div class="container-fluid">
+     <h3>Find a Tutor.</h3>
+    <div class="row">
+     <div class="col-md-6 col-sm-6 col-xs-12">
+      <form action="find_tutor"  method="POST" id="find_tutor">
+        <!-- Location -->
+        <div class="form-group">
+          <label class="control-label" for="center_location">Location</label>
+          <select class="select form-control" id="center_location" name="center_location">
+            <option value="Math Center">Math Center</option>
+            <option value="Writing Center">Writing Center</option>
+            <option value="1 on 1">1 on 1</option>
+          </select>
+        </div>
+
+        <!-- Course -->
+       <div class="form-group">
+        <label class="control-label" for="course_code">Course</label>
+        <input class="form-control" id="course_code" name="course_code" type="text"/>
+       </div>
+
+       <!-- Hour Range -->
+       <div class="form-group">
+         <label class="control-label" for="time_range">Hours</label>
+         <br>
+         <br>
+         <input class="form-control" name="time_range" type="text" id="time_range" />
+       </div>
+
+       <!-- Day selector -->
+       <div class="form-group">
+         <div class="weekDays-selector">
+           <label for="day_selected" class="control-label">Select Days</label>
+           <input type="checkbox" id="weekday_mon" class="weekday" />
+           <label for="weekday_mon">Mon</label>
+           <input type="checkbox" id="weekday_tue" class="weekday" />
+           <label for="weekday_tue">Tue</label>
+           <input type="checkbox" id="weekday_wed" class="weekday" />
+           <label for="weekday_wed">Wed</label>
+           <input type="checkbox" id="weekday_thu" class="weekday" />
+           <label for="weekday_thu">Thu</label>
+           <input type="checkbox" id="weekday_fri" class="weekday" />
+           <label for="weekday_fri">Fri</label>
+           <input type="checkbox" id="weekday_sat" class="weekday" />
+         </div>
+       </div>
+
+       <div class="form-group">
+         <button class="btn btn-primary " name="submit" type="submit">Find</button>
+       </div>
+
+      </form>
+     </div>
+    </div>
+   </div>
+  </div>
+  <body>
