@@ -26,23 +26,25 @@
 </style>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-  $('#login').on('submit', function(e) {
-    e.preventDefault();
-    $.ajax({
-      type: 'post',
-      url:'login',
-      data: $(this).serialize(),
-      success: function(response) {
-        if (response.success) {
-          // console.log("able to login");
-        }else{
-          // console.log("Error! Unable to login");
+  $(document).ready(function() {
+    $('#login').on('submit', function(e) {
+      console.log("somehting");
+      // e.preventDefault();
+      $.ajax({
+        type: 'post',
+        url: 'login',
+        data: $(this).serialize(),
+        success: function(response) {
+          if (response.success) {
+            console.log(response.success);
+            // console.log("able to login");
+          }else{
+            // console.log("Error! Unable to login");
+          }
         }
-      }
+      });
     });
   });
-});
 
 </script>
 <body>
@@ -54,23 +56,23 @@ $(document).ready(function() {
       <div class="Absolute-Center is-Responsive">
         <div class="col-sm-12 col-md-10 col-md-offset-1">
             <form action="login"  method="POST" id="login">
-            <!-- PPU Username -->
-            <div class="form-group input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-              <input class="form-control" id="user" type="text" name ="text" placeholder="Enter PPU username">
-            </div>
-            <!-- PPU Password -->
-            <div class="form-group input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-              <input class="form-control" id="pwd" type="password" name='password' placeholder="password"/>
-            </div>
-            <!-- Submit button -->
-            <div class="form-group">
-              <button type="button" class="btn btn-primary">Login</button>
-            </div>
-            <div class="form-group text-center">
-              <a href="mailto:tutoring@pointpark.edu">Having Trouble Signing In?</a>
-            </div>
+              <!-- PPU Username -->
+              <div class="form-group input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input class="form-control" id="user" type="text" name ="text" placeholder="Enter PPU username">
+              </div>
+              <!-- PPU Password -->
+              <div class="form-group input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input class="form-control" id="pwd" type="password" name='password' placeholder="password"/>
+              </div>
+              <!-- Submit button -->
+              <div class="form-group">
+                <button type="button" class="btn btn-primary" name="submit" type="submit" >Login</button>
+              </div>
+              <div class="form-group text-center">
+                <a href="mailto:tutoring@pointpark.edu">Having Trouble Signing In?</a>
+              </div>
           </form>
         </div>
       </div>

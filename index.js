@@ -87,7 +87,7 @@ function connect(cb) {
 // To show current user specific nav tools. Will add privileges later...
 function getMenu(req) {
   var menu = [];
-  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student View"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student View"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
   return menu;
 };
 
@@ -135,6 +135,25 @@ app.get('/skills_specialties', function(req, res) {
   res.render('skills_specialties', {
     menu: getMenu(req)
   });
+});
+
+app.get('/tutor_list', function(req, res) {
+  res.render('tutor_list', {
+    menu: getMenu(req)
+  });
+});
+
+
+app.post("/login", function(req,res) {
+  res.send({email:"tcampb@pointpark.edu", password:"0000"});
+});
+
+
+
+
+app.post("/find_tutor", function(req,res) {
+  result = {tutor_id:"001", tutor_name:"Name", date:"convert to mm/dd/yyyy", day_avaible:"Monday", hour_avaible: "break up into intervals"}
+  res.send({success:result});
 });
 
 
