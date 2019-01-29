@@ -32,8 +32,6 @@
   }
 
 </style>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<!-- Stuff for time range slider bar -->
 <link rel="stylesheet" href="https://www.cssscript.com/demo/animated-customizable-range-slider-pure-javascript-rslider-js/css/rSlider.min.css">
 <script src="https://www.cssscript.com/demo/animated-customizable-range-slider-pure-javascript-rslider-js/js/rSlider.min.js"></script>
 <script type="text/javascript">
@@ -128,108 +126,106 @@
 
   });
 </script>
-<body>
-  <div class="bootstrap-iso">
-   <div class="container-fluid" id="entry">
-     <h3>Find a Tutor.</h3>
-    <div class="row">
-     <div class="col-md-6 col-sm-6 col-xs-12">
-      <form action="find_tutor"  method="POST" id="find_tutor">
-        <!-- Location -->
-        <div class="form-group">
-          <label class="control-label" for="center_location">Location</label>
-          <select class="select form-control" id="center_location" name="center_location">
-            <option value="Math Center">Math Center</option>
-            <option value="Writing Center">Writing Center</option>
-            <option value="1 on 1">1 on 1</option>
-          </select>
-        </div>
+<div class="bootstrap-iso">
+ <div class="container-fluid" id="entry">
+   <h3>Find a Tutor.</h3>
+  <div class="row">
+   <div class="col-md-6 col-sm-6 col-xs-12">
+    <form action="find_tutor"  method="POST" id="find_tutor">
+      <!-- Location -->
+      <div class="form-group">
+        <label class="control-label" for="center_location">Location</label>
+        <select class="select form-control" id="center_location" name="center_location">
+          <option value="Math Center">Math Center</option>
+          <option value="Writing Center">Writing Center</option>
+          <option value="1 on 1">1 on 1</option>
+        </select>
+      </div>
 
-        <!-- Course -->
-       <div class="form-group">
-        <label class="control-label" for="course_code">Course</label>
-        <input class="form-control" id="course_code" name="course_code" type="text"/>
-       </div>
-
-       <!-- Hour Range -->
-       <div class="form-group">
-         <label class="control-label" for="time_range">Hours</label>
-         <br>
-         <br>
-         <input class="form-control" name="time_range" type="text" id="time_range" />
-       </div>
-
-       <!-- Day selector -->
-       <div class="form-group">
-         <div class="weekDays-selector">
-           <label for="day_selected" class="control-label">Select Days</label>
-           <input type="checkbox" id="weekday_mon" class="weekday" />
-           <label for="weekday_mon">Mon</label>
-           <input type="checkbox" id="weekday_tue" class="weekday" />
-           <label for="weekday_tue">Tue</label>
-           <input type="checkbox" id="weekday_wed" class="weekday" />
-           <label for="weekday_wed">Wed</label>
-           <input type="checkbox" id="weekday_thu" class="weekday" />
-           <label for="weekday_thu">Thu</label>
-           <input type="checkbox" id="weekday_fri" class="weekday" />
-           <label for="weekday_fri">Fri</label>
-           <input type="checkbox" id="weekday_sat" class="weekday" />
-         </div>
-       </div>
-
-       <div class="form-group">
-         <button class="btn btn-primary " name="submit" type="submit">Find</button>
-       </div>
-
-      </form>
+      <!-- Course -->
+     <div class="form-group">
+      <label class="control-label" for="course_code">Course</label>
+      <input class="form-control" id="course_code" name="course_code" type="text"/>
      </div>
-    </div>
+
+     <!-- Hour Range -->
+     <div class="form-group">
+       <label class="control-label" for="time_range">Hours</label>
+       <br>
+       <br>
+       <input class="form-control" name="time_range" type="text" id="time_range" />
+     </div>
+
+     <!-- Day selector -->
+     <div class="form-group">
+       <div class="weekDays-selector">
+         <label for="day_selected" class="control-label">Select Days</label>
+         <input type="checkbox" id="weekday_mon" class="weekday" />
+         <label for="weekday_mon">Mon</label>
+         <input type="checkbox" id="weekday_tue" class="weekday" />
+         <label for="weekday_tue">Tue</label>
+         <input type="checkbox" id="weekday_wed" class="weekday" />
+         <label for="weekday_wed">Wed</label>
+         <input type="checkbox" id="weekday_thu" class="weekday" />
+         <label for="weekday_thu">Thu</label>
+         <input type="checkbox" id="weekday_fri" class="weekday" />
+         <label for="weekday_fri">Fri</label>
+         <input type="checkbox" id="weekday_sat" class="weekday" />
+       </div>
+     </div>
+
+     <div class="form-group">
+       <button class="btn btn-primary " name="submit" type="submit">Find</button>
+     </div>
+
+    </form>
    </div>
-   <div class="container-fluid" id="result">
+  </div>
+ </div>
+ <div class="container-fluid" id="result">
 
-     <!-- <table>
-       <tbody>
-         <tr>
-           <td>
-             <div class="dayofweek date">
-               will hold the day of week and date of tutoring
+   <!-- <table>
+     <tbody>
+       <tr>
+         <td>
+           <div class="dayofweek date">
+             will hold the day of week and date of tutoring
 
-             </div>
-             <div class="name">
-               name of tutor
-               <div class="link">
-                 list of tutors hours in 30 min increments
-                 opens a model to confirm session
+           </div>
+           <div class="name">
+             name of tutor
+             <div class="link">
+               list of tutors hours in 30 min increments
+               opens a model to confirm session
 
-                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmSession">
-                   Launch demo modal
-                 </button>
+               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmSession">
+                 Launch demo modal
+               </button>
 
-                 <button type="button" class="btn btn-link" data-toggle="modal" data-target="">${tutors hours}</button>
+               <button type="button" class="btn btn-link" data-toggle="modal" data-target="">${tutors hours}</button>
 
-                 <div class="modal fade" id="confirmSession" tabindex="-1" role="dialog" aria-labelledby="confirmSessionLabel" aria-hidden="true">
-                   <div class="modal-dialog" role="document">
-                     <div class="modal-content">
-                       <div class="modal-header">
-                         <h5 class="modal-title" id="confirmSessionLabel">Confirm 1 on 1</h5>
-                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                           <span aria-hidden="true">&times;</span>
-                         </button>
-                       </div>
-                       <div class="modal-footer">
-                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                         <button type="button" class="btn btn-primary">Save changes</button>
-                       </div>
+               <div class="modal fade" id="confirmSession" tabindex="-1" role="dialog" aria-labelledby="confirmSessionLabel" aria-hidden="true">
+                 <div class="modal-dialog" role="document">
+                   <div class="modal-content">
+                     <div class="modal-header">
+                       <h5 class="modal-title" id="confirmSessionLabel">Confirm 1 on 1</h5>
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">&times;</span>
+                       </button>
+                     </div>
+                     <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                       <button type="button" class="btn btn-primary">Save changes</button>
                      </div>
                    </div>
                  </div>
                </div>
-
              </div>
-           </td>
-         </tr>
-       </tbody>
-     </table> -->
-   </div>
-  </div>
-  <body>
+
+           </div>
+         </td>
+       </tr>
+     </tbody>
+   </table> -->
+ </div>
+</div>

@@ -1,4 +1,41 @@
-<body>
-  <h2>Schedule</h2>
-  <h4>Creates work schedule for tutor.</h4>
-</body>
+<style media="screen">
+  #calendar {
+    width: 1200px;
+    margin: auto;
+    margin-top: 20pt;
+  }
+</style>
+
+<script type="text/javascript">
+  // https://fullcalendar.io/docs
+  $(function() {
+    // setTimeout(function() {}, 5000);
+    $('#calendar').fullCalendar({
+      selectable: true,
+      weekends: false,
+      height: 800,
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      dayClick: function(date) {
+        alert('clicked ' + date.format());
+      },
+      select: function(startDate, endDate) {
+        alert('selected ' + startDate.format() + ' to ' + endDate.format());
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
+</script>
+
+<div id="calendar"></div>
