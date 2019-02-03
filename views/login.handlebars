@@ -1,83 +1,80 @@
 <style>
-  div.well{
-    height: 250px;
-  }
+.bootstrap-iso .formden_header h2, .bootstrap-iso .formden_header p, .bootstrap-iso form {
+  font-family: Arial, Helvetica, sans-serif;
+  color: black
+}
 
-  .Absolute-Center {
-    margin: auto;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
-  }
+.bootstrap-iso form button, .bootstrap-iso form button:hover {
+  color: white !important;
+}
 
-  .Absolute-Center.is-Responsive {
-    width: 50%;
-    height: 50%;
-    min-width: 200px;
-    max-width: 400px;
-    padding: 40px;
-  }
+.container-fluid {
+  width: 500px;
+  margin: auto;
+  margin-top: 10px;
 
-  .container {
-      text-align: center;
-  }
-  #header {
-      width: 600px;
-      text-align: left;
-      margin-top: 10pt;
-      margin-left: auto;
-      margin-right: auto;
-  }
+}
+
+.row{
+  width: 600px;
+  background-color: #ffffff;
+  display: block;
+  float: left;
+  margin-right: 50px;
+}
+
 
 </style>
 <script type="text/javascript">
   $(document).ready(function() {
     $('#login').on('submit', function(e) {
-      console.log("somehting");
-      // e.preventDefault();
+      e.preventDefault();
       $.ajax({
         type: 'post',
-        url: 'login',
+        url:'login',
         data: $(this).serialize(),
         success: function(response) {
-          if (response.success) {
+          if (response.success == true) {
             console.log(response.success);
-            // console.log("able to login");
+            location.assign("student_view");
           }else{
-            // console.log("Error! Unable to login");
+            alert("Incorrect Password!")
           }
+        },
+        error: function() {
+          console.log("Error");
         }
       });
     });
   });
 
 </script>
-<div class="container">
+<div class="bootstrap-iso">
+ <div class="container-fluid">
+   <h3>Welcome!</h3>
   <div class="row">
-    <div id="header">
-      <h2>Welcome to the Tutor Center!</h2>
-    </div>
-    <div class="Absolute-Center is-Responsive">
-      <div class="col-sm-12 col-md-10 col-md-offset-1">
-          <form action="login"  method="POST" id="login">
-            <!-- PPU Username -->
-            <div class="form-group input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-              <input class="form-control" id="user" type="text" name ="text" placeholder="Enter PPU username">
-            </div>
-            <!-- PPU Password -->
-            <div class="form-group input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-              <input class="form-control" id="pwd" type="password" name='password' placeholder="password"/>
-            </div>
-            <!-- Submit button -->
-            <div class="form-group">
-              <button type="button" class="btn btn-primary" name="submit" type="submit">Login</button>
-            </div>
-            <div class="form-group text-center">
-              <a href="mailto:tutoring@pointpark.edu">Having Trouble Signing In?</a>
-            </div>
-        </form>
+   <div class="col-md-6 col-sm-6 col-xs-12">
+    <form action="login"  method="POST" id="login">
+     <div class="form-group ">
+      <label class="control-label " for="user">Username</label>
+       <input class="form-control" id="user" name="user" placeholder="PPU username" type="text"/>
+     </div>
+     <div class="form-group ">
+      <label class="control-label " for="pwd">Password</label>
+       <input class="form-control" id="pwd" name="pwd" placeholder="password" type="password"/>
+     </div>
+     <div class="form-group">
+      <div>
+       <button class="btn btn-primary " name="submit" type="submit">Submit</button>
       </div>
-    </div>
+     </div>
+     <div class="form-group">
+      <div>
+       <a href="mailto:tutoring@pointpark.edu">Having Trouble Signing In?</a>
+      </div>
+     </div>
+    </form>
+   </div>
   </div>
+ </div>
 </div>

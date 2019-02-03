@@ -84,6 +84,24 @@ function connect(cb) {
   });
 }
 
+// generates random string of characters
+var genRandomString = function(length){
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex') // converts to hexadecimal format
+            .slice(0,length);   // returns required number of characters
+};
+
+var sha512 = function(password, salt){
+    var hash = crypto.createHmac('sha512', salt);
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+      password:password,
+      salt:salt,
+      passwordHash:value
+    };
+};
+
 // To show current user specific nav tools. Will add privileges later...
 function getMenu(req) {
   var menu = [];
@@ -91,72 +109,153 @@ function getMenu(req) {
   return menu;
 };
 
+
+
+function getMenu(req){
+  var menu =[];
+  var isAdmin = req.session.is_admin;
+  var isTutor = req.session.is_tutor;
+
+   menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Find Tutor"});
+
+   if (isTutor) {
+     menu.push({"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+
+   }
+   else if (isAdmin) {
+     menu.push({"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
+   }
+  return menu;
+};
+
+
+
+
 // Renders Login page, prompts user to login with PPU email / password
 app.get('/', function(req, res) {
-  res.render('login', {
-    menu: getMenu(req)
-  });
+  if(req.session.user_id) {
+    res.redirect(303,'student_view');
+  }else {
+    res.render('login', {
+       menu: getMenu(req),
+       login: req.session.user_id ? req.session.user_id : false,
+       user_name: req.session.user_first_name,
+    });
+  }
 });
+
 
 // Redirect for student
 app.get('/student_view', function(req, res) {
   res.render('student_view', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 // Redirect for tutor, tutor can still be student so have to have option to switch back and fourth
 app.get('/tutor_view', function(req, res) {
   res.render('tutor_view', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 // Redirect for admin, Gives full access to see all tutors as well as students. Also gives additional features
 app.get('/admin_view', function(req, res) {
   res.render('admin_view', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 app.get('/student_log', function(req, res) {
   res.render('student_log', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 app.get('/schedule', function(req, res) {
   res.render('schedule', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 app.get('/skills_specialties', function(req, res) {
   res.render('skills_specialties', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
 app.get('/tutor_list', function(req, res) {
   res.render('tutor_list', {
-    menu: getMenu(req)
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
   });
 });
 
-
-app.post("/login", function(req,res) {
-  res.send({email:"tcampb@pointpark.edu", password:"0000"});
+app.get("/logout", function(req,res){
+  delete req.session.user_id;
+  delete req.session.is_admin;
+  delete req.session.is_tutor;
+  delete req.session.user_first_name;
+  res.redirect(303, ".");
 });
 
 
+app.post("/login", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var user = req.body.user;
+      var password = req.body.pwd;
+      var q  ="SELECT * FROM user WHERE email = ?";
+      var values = [user];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (result[0]) {
+            var salt = result[0].salt;
+            var passwordData = sha512(password, salt);
+            if (result[0].password === passwordData.passwordHash) {
+              req.session.user_id = result[0].id;
+              req.session.is_admin = result[0].is_admin;
+              req.session.is_admin = result[0].is_tutor;
+              req.session.user_first_name = result[0].first_name;
+              req.session.cookie.maxAge = 9000000;
+              res.send({success:true});
+            }
 
+          }
+        });
+      }catch (err) {
+        console.log(err, " Error in login.post function");
+      }
+    }
+  });
+});
 
 app.post("/find_tutor", function(req,res) {
   result = {tutor_id:"001", tutor_name:"Name", date:"convert to mm/dd/yyyy", day_avaible:"Monday", hour_avaible: "break up into intervals"}
   res.send({success:result});
 });
 
-
+app.post("/student_log", function(req,res) {
+  result = {student_id:"001", first_name:"First", last_name:"Last", date:"mm/dd/yyyy", time_in:"11:00", time_out:"14:00", duration:"3", subject:"CMPS 480", location:"Mat Center", tutor:"Tanner Campbell"};
+  res.send({success:result});
+});
 
 
 

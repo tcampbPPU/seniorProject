@@ -63,66 +63,68 @@
         type: 'post',
         url: 'find_tutor',
         data: $(this).serialize(),
-        success: function (response) {
-
-          $("#entry").hide();
-          var button = $("<button>");
-          $(document.body).append(button);
-          button.append("New Search");
-          button.addClass("btn btn-secondary");
-          button.click(function() {
-            document.location.href = "/student_view";
-          });
-          // Building table
-          console.log(response.success.tutor_id);
-          var k = 0;
-          var table_body = '<table border="1" id="example"><thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Days</th><th>Hours</th></tr></thead><tbody>';
-          for (j in response) {
-            // for(i = 0; i < response.length; i++) {
-              table_body+= '<tr>';
-              table_body += '<td>';
-              table_body += response.success["tutor_id"];
-              table_body += '</td>';
-
-              table_body += '<td>';
-              table_body += response.success["tutor_name"];
-              table_body += '</td>';
-
-              table_body += '<td>';
-              table_body += response.success["date"];
-              table_body += '</td>';
-
-              table_body += '<td>';
-              table_body += response.success["day_avaible"];
-              table_body += '</td>';
-
-              table_body += '<td>';
-              table_body += response.success["hour_avaible"];
-              table_body += '</td>';
-              table_body+='</tr>';
-            // }
-            // k++;
+        success: function (data) {
+          if (data.success) {
+            showResult(data);
+          }else {
+            console.log("Error in find_tutor");
           }
-          table_body += '</tbody></table>';
-          $('#result').html(table_body);
+        },
+        error: function() {
+          console.log("Opps. somthing went wrong");
         }
       });
-      // e.preventDefault();
-      // $.ajax({
-      //   type: 'post',
-      //   url:'find_tutor',
-      //   data: $(this).serialize(), // time range data might looked wierd..
-      //   success: function(response) {
-      //     if (response.success) {
-      //       // console.log("Tutor Found");
-      //       // TODO: possibly create a dynamic tutor that loads all the tutors found in search
-      //             // Then make each tutor clickable, open modal for student to schedule with them...
-      //     }else{
-      //       // console.log("Error! Unable to find tutor, or none available from search");
-      //     }
-      //   }
-      // });
     });
+
+    function showResult(result) {
+      $("#entry").css("display", "none");
+      $("#result_display").empty();
+      $("#result_display").show();
+      if (result) {
+        var table_body = '<table border="1" id="tble"><thead><tr><th>ID</th><th>Name</th><th>Date</th><th>Days</th><th>Hours</th></tr></thead><tbody>';
+        for (item in result) {
+          table_body += '<tr>';
+          table_body += '<td>';
+          table_body += result.success["tutor_id"];
+          table_body += '</td>';
+
+          table_body += '<td>';
+          table_body += result.success["tutor_name"];
+          table_body += '</td>';
+
+          table_body += '<td>';
+          table_body += result.success["date"];
+          table_body += '</td>';
+
+          table_body += '<td>';
+          table_body += result.success["day_avaible"];
+          table_body += '</td>';
+
+          table_body += '<td>';
+          table_body += result.success["hour_avaible"];
+          table_body += '</td>';
+          table_body += '</tr>';
+        }
+        table_body += '</tbody></table>';
+        var button = $("<button>");
+        $(document.body).append(button);
+        button.append("New Search");
+        button.addClass("btn btn-secondary");
+        button.css({top: 80, left: 50, position:'absolute'});
+        $('#result_display').css({top: 120, left: 50, position:'absolute'});
+        $('#result_display').html(table_body);
+        pageToggle(button);
+      }
+    }
+
+    function pageToggle(btn) {
+      btn.click(function() {
+        $("#result_display").hide();
+        $(this).hide();
+        $("#entry").show();
+      });
+    }
+
 
   });
 </script>
@@ -182,50 +184,6 @@
    </div>
   </div>
  </div>
- <div class="container-fluid" id="result">
-
-   <!-- <table>
-     <tbody>
-       <tr>
-         <td>
-           <div class="dayofweek date">
-             will hold the day of week and date of tutoring
-
-           </div>
-           <div class="name">
-             name of tutor
-             <div class="link">
-               list of tutors hours in 30 min increments
-               opens a model to confirm session
-
-               <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmSession">
-                 Launch demo modal
-               </button>
-
-               <button type="button" class="btn btn-link" data-toggle="modal" data-target="">${tutors hours}</button>
-
-               <div class="modal fade" id="confirmSession" tabindex="-1" role="dialog" aria-labelledby="confirmSessionLabel" aria-hidden="true">
-                 <div class="modal-dialog" role="document">
-                   <div class="modal-content">
-                     <div class="modal-header">
-                       <h5 class="modal-title" id="confirmSessionLabel">Confirm 1 on 1</h5>
-                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                         <span aria-hidden="true">&times;</span>
-                       </button>
-                     </div>
-                     <div class="modal-footer">
-                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                       <button type="button" class="btn btn-primary">Save changes</button>
-                     </div>
-                   </div>
-                 </div>
-               </div>
-             </div>
-
-           </div>
-         </td>
-       </tr>
-     </tbody>
-   </table> -->
- </div>
+ <!-- <div class="container-fluid" id="result"></div> -->
+ <div id="result_display" style="clear:both;width:100%; "></div>
 </div>
