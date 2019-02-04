@@ -10,7 +10,8 @@
     padding: inherit;
   }
 
-  .weekDays-selector input {
+
+  /* .weekDays-selector input {
     display: none!important;
   }
 
@@ -29,7 +30,8 @@
   .weekDays-selector input[type=checkbox]:checked + label {
     background: #2AD705;
     color: #ffffff;
-  }
+  } */
+
 
 </style>
 <link rel="stylesheet" href="https://www.cssscript.com/demo/animated-customizable-range-slider-pure-javascript-rslider-js/css/rSlider.min.css">
@@ -50,13 +52,14 @@
         tooltip: true, // shows current vals
         scale: false,
         labels: false,
-        width: null // not sure what other value goes here
+        width: 550 // not sure what other value goes here
         // onChange: function (vals) {console.log(vals);}
         // console.log(timeSlider.getValue());
       });
     }
 
     $('#find_tutor').on('submit', function(e) {
+      console.log();
       $('#result').show();
       e.preventDefault();
       $.ajax({
@@ -159,7 +162,7 @@
      </div>
 
      <!-- Day selector -->
-     <div class="form-group">
+     <!-- <div class="form-group">
        <div class="weekDays-selector">
          <label for="day_selected" class="control-label">Select Days</label>
          <input type="checkbox" id="weekday_mon" class="weekday" />
@@ -172,7 +175,32 @@
          <label for="weekday_thu">Thu</label>
          <input type="checkbox" id="weekday_fri" class="weekday" />
          <label for="weekday_fri">Fri</label>
-         <input type="checkbox" id="weekday_sat" class="weekday" />
+       </div>
+     </div> -->
+
+     <div class="form-group " id="pick_day">
+       <label class="control-label ">Select Days</label>
+       <div class="">
+         <div class="checkbox">
+           <label class="checkbox">
+           <input name="days_selected" type="checkbox" value="Mon"/>Mon</label>
+         </div>
+         <div class="checkbox">
+           <label class="checkbox">
+           <input name="days_selected" type="checkbox" value="Tue"/>Tue</label>
+         </div>
+         <div class="checkbox">
+           <label class="checkbox">
+           <input name="days_selected" type="checkbox" value="Wed"/>Wed</label>
+         </div>
+         <div class="checkbox">
+           <label class="checkbox">
+           <input name="days_selected" type="checkbox" value="Thu"/>Thu</label>
+         </div>
+         <div class="checkbox">
+           <label class="checkbox">
+           <input name="days_selected" type="checkbox" value="Fri"/>Fri</label>
+         </div>
        </div>
      </div>
 
