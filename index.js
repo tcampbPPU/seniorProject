@@ -102,28 +102,20 @@ var sha512 = function(password, salt){
     };
 };
 
-// To show current user specific nav tools. Will add privileges later...
+
 function getMenu(req) {
   var menu = [];
-  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Student View"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
-  return menu;
-};
-
-
-
-function getMenu(req){
-  var menu =[];
   var isAdmin = req.session.is_admin;
   var isTutor = req.session.is_tutor;
 
-   menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Find Tutor"});
+   menu.push({"page": ".", "label": "Home"});
 
    if (isTutor) {
-     menu.push({"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+     menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
 
    }
    else if (isAdmin) {
-     menu.push({"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
+     menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
    }
   return menu;
 };
@@ -204,7 +196,7 @@ app.get('/tutor_list', function(req, res) {
   });
 });
 
-app.get("/logout", function(req,res){
+app.get("/logout", function(req, res) {
   delete req.session.user_id;
   delete req.session.is_admin;
   delete req.session.is_tutor;
@@ -247,14 +239,108 @@ app.post("/login", function(req, res) {
   });
 });
 
-app.post("/find_tutor", function(req,res) {
-  result = {tutor_id:"001", tutor_name:"Name", date:"convert to mm/dd/yyyy", day_avaible:"Monday", hour_avaible: "break up into intervals"}
-  res.send({success:result});
+
+app.post("/find_tutor", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var sql = "select `first_name`, `last_name`, `start`, `end` from schedule left join user on schedule.tutor_id = user.id left join course on user.course_id = course.id where user.is_tutor = 1";
+      for (var property in req.body) {
+        var value = req.body[property];
+        if (value !== "") {
+          if (property === 'time_range') {
+            var timeRange = value.split(',');
+            var time1 = timeRange[0];
+            var time2 = timeRange[1];
+            sql += " AND"
+            sql += " " + property + " BETWEEN " + time1 + " AND " + time2;
+          }
+          else if (property === 'days_selected') {
+            sql += " AND"
+            sql += " " + property + " IN (" + value + ")";
+          }else {
+            sql += " AND"
+            sql += " " + property + " = " + value;
+          }
+        }
+      }
+      sql += ';'
+      console.log(sql);
+      // console.log(centerLocal, courseCode, timeRange, days);
+      try {
+        // con.query(q, values, function (err, result, fields) {
+          // find tutor given a specfic Search
+
+        // });
+
+      }catch (err) {
+        console.log(err, " Error in find_tutor.post function");
+
+      }
+
+    }
+  });
 });
 
-app.post("/student_log", function(req,res) {
-  result = {student_id:"001", first_name:"First", last_name:"Last", date:"mm/dd/yyyy", time_in:"11:00", time_out:"14:00", duration:"3", subject:"CMPS 480", location:"Mat Center", tutor:"Tanner Campbell"};
-  res.send({success:result});
+app.post("/student_log", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var fName = req.body.first_name;
+      var lName = req.body.last_name;
+      var subj = req.body.subject;
+      var date = req.body.date;
+      var location = req.body.location;
+      var tutor = req.body.tutor;
+      console.log(fName, lName, subj, date, location, tutor);
+      try {
+        // con.query(q, values, function (err, result, fields) {
+          // show list of previous appointments give search critera
+        // });
+
+      } catch (err) {
+        console.log(err, " Error in student_log.post function");
+
+      }
+    }
+
+
+  });
+});
+
+
+app.post("/tutor_list", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var fName = req.body.first_name;
+      var lName = req.body.last_name;
+      var subj = req.body.subject;
+      console.log(fName, lName, subj);
+      try {
+        // con.query(q, values, function (err, result, fields) {
+          // show list of tutors given search criteria
+
+
+        // });
+      } catch (err) {
+          console.log(err, " Error in tutor_list.post function");
+
+      }
+
+    }
+
+
+  });
 });
 
 
