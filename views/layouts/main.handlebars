@@ -10,6 +10,11 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" charset="utf-8"></script>
       <script src="fullcalendar.min.js"></script>
       <style media="screen">
+        body {
+          background-color: white;
+          color: black;
+        }
+
         .footer {
           position: absolute;
           bottom: 0;
@@ -20,7 +25,7 @@
         }
       </style>
   </head>
-  <body style='background-color:white; color:black;'>
+  <body>
     <!--Navgation Bar, only shown to tutors and admin. Admin should have features shown tutor does not have access to.-->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,16 +40,15 @@
           {{/each}}
         </ul>
       </div>
-      <!-- To handle logging out -->
-      <!-- {{#if login}}
-       <span class="nav-item " style="float:right;" >
-         <table>
-           <tr style="background-color:inherit;">
-            <td> <a class="nav-link " href="logout" style="color:grey;">Logout</a></td>
-           </tr>
-         </table>
-      </span>
-      {{/if}} -->
+      {{#if login}}
+      <span class="nav-item " style="float:right;" >
+        <table>
+          <tr style="background-color:inherit;">
+            <td></td><td>{{user_name}}</td><td> <a class="nav-link " href="logout" style="color:grey;">Logout</a></td>
+          </tr>
+        </table>
+     </span>
+     {{/if}}
     </nav>
     {{{body}}}
     <footer class="footer">
