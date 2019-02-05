@@ -108,15 +108,15 @@ function getMenu(req) {
   var isAdmin = req.session.is_admin;
   var isTutor = req.session.is_tutor;
 
-   menu.push({"page": ".", "label": "Home"});
+  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
 
-   if (isTutor) {
-     menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
-
-   }
-   else if (isAdmin) {
-     menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
-   }
+   // if (isTutor) {
+   //   menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
+   //
+   // }
+   // else if (isAdmin) {
+   //   menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
+   // }
   return menu;
 };
 
@@ -247,71 +247,72 @@ app.post("/find_tutor", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var sql = "select `first_name`, `last_name`, `start`, `end` from schedule left join user on schedule.tutor_id = user.id left join course on user.course_id = course.id where user.is_tutor = 1";
-      for (var property in req.body) {
-        var value = req.body[property];
-        if (value !== "") {
-          if (property === 'time_range') {
-            var timeRange = value.split(',');
-            var time1 = timeRange[0];
-            var time2 = timeRange[1];
-            sql += " AND"
-            sql += " " + property + " BETWEEN " + time1 + " AND " + time2;
-          }
-          else if (property === 'days_selected') {
-            sql += " AND"
-            sql += " " + property + " IN (" + value + ")";
-          }else {
-            sql += " AND"
-            sql += " " + property + " = " + value;
-          }
-        }
-      }
-      sql += ';'
-      console.log(sql);
-      // console.log(centerLocal, courseCode, timeRange, days);
-      try {
-        // con.query(q, values, function (err, result, fields) {
-          // find tutor given a specfic Search
+      // TODO: Need to cross check with appointment table to see if tutor already has appointment, don't want to show that to user
+      // Also check with current date so we arent not returning schedule from weeks ago
+      // var date = new Date(); date.setDate(date.getDate() - 7); console.log(date.toLocaleString());
 
-        // });
+      var course = req.body.course_search;
+      var q = "select course.course_code, course.course_name, user.id, user.first_name, user.last_name, schedule.date, schedule.start, schedule.end from course left join tutor_has_course on course.id = tutor_has_course.course_id left join user on tutor_has_course.user_id = user.id left join schedule on user.id =  schedule.tutor_id where user.is_tutor = 1 and course_code = ?";
+      var values = [course];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success:false});
+          }else {
+            if (result.length != 0) {
+              res.send({success:result});
+            }
+            else {
+              res.send({success:false});
+            }
+          }
+        });
 
       }catch (err) {
         console.log(err, " Error in find_tutor.post function");
-
       }
-
     }
   });
 });
 
+
+app.post("/save_schedule", function(req, res) {
+
+});
+
+
+
+
 app.post("/student_log", function(req, res) {
-  connect(function(con) {
-    var errors = req.validationErrors();
-    if (errors) {
-      req.session.errors = errors;
-      res.redirect(303, ".");
-    }else {
-      var fName = req.body.first_name;
-      var lName = req.body.last_name;
-      var subj = req.body.subject;
-      var date = req.body.date;
-      var location = req.body.location;
-      var tutor = req.body.tutor;
-      console.log(fName, lName, subj, date, location, tutor);
-      try {
-        // con.query(q, values, function (err, result, fields) {
-          // show list of previous appointments give search critera
-        // });
-
-      } catch (err) {
-        console.log(err, " Error in student_log.post function");
-
-      }
-    }
-
-
-  });
+  // connect(function(con) {
+  //   var errors = req.validationErrors();
+  //   if (errors) {
+  //     req.session.errors = errors;
+  //     res.redirect(303, ".");
+  //   }else {
+  //     var fName = req.body.first_name;
+  //     var lName = req.body.last_name;
+  //     var subj = req.body.subject;
+  //     var date = req.body.date;
+  //     var location = req.body.location;
+  //     var tutor = req.body.tutor;
+  //     console.log(fName, lName, subj, date, location, tutor);
+  //     try {
+  //       // con.query(q, values, function (err, result, fields) {
+  //         // show list of previous appointments give search critera
+  //       // });
+  //
+  //     } catch (err) {
+  //       console.log(err, " Error in student_log.post function");
+  //
+  //     }
+  //   }
+  //
+  //
+  // });
+  result = {student_id:"001", first_name:"First", last_name:"Last", date:"mm/dd/yyyy", time_in:"11:00", time_out:"14:00", duration:"3", subject:"CMPS 480", location:"Mat Center", tutor:"Tanner Campbell"};
+  res.send({success:result});
 });
 
 
