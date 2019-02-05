@@ -23,9 +23,6 @@
 
 <script type="text/javascript">
   // Showing the Table to the Student
-
-  //https://stackoverflow.com/questions/12019130/how-can-i-load-all-events-on-calendar-using-ajax
-
   // https://fullcalendar.io/docs
   $(function() {
     $('#find_tutor').on('submit', function(e) {
@@ -36,70 +33,15 @@
         data: $(this).serialize(),
         success: function(data) {
           if (data.success) {
-            for (var key in data.success) {
-               if (data.success.hasOwnProperty(key)) {
-                  var course_code = data.success[key].course_code;
-                  var course_name = data.success[key].course_name;
-                  var tutor_id = data.success[key].id;
-                  var first_name = data.success[key].first_name;
-                  var last_name = data.success[key].last_name;
-                  var date = data.success[key].date.slice(0,11);
-                  var start = data.success[key].start;
-                  var end = data.success[key].end;
-               }
-
-              $('#calendar').fullCalendar({
-                header: {
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'month,agendaWeek,agendaDay'
-                },
-                editable: false,
-                selectable: false,
-                selectHelper: false,
-                weekends: false,
-                height: 800,
-                minTime: "07:00:00",
-                maxTime: "21:00:00",
-                // slotDuration: '00:15:00',
-                defaultView: "agendaWeek",
-                eventColor: 'green',
-                events: [
-                  {
-                    title: first_name + " " + last_name,
-                    start: date + start,
-                    end: date + end,
-                    description: course_code + " " + course_name,
-                    allDay: false
-                  }
-                ],
-                eventAfterRender: function(event, elt, view ) {
-                  var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
-                  if(elt.find(".fc-event-title").length === 0) {
-                    elt.find(".fc-event-time").text(formattedTime + " - " + event.title);
-                  }else {
-                    elt.find(".fc-event-time").text(formattedTime);
-                  }
-                   elt.find('.fc-title').after("<span>"+ event.description +"</span>");
-                },
-                eventClick: function(event) {
-                  // redircect user to new page
-                  // bring event data
-                  // location.assign("");
-                  console.log("redirect to appointment confirmation page");
-
-                }
-              });
+            var evtCount = data.success.length;
+            var events = [];
+            for (var i = 0; i < evtCount; i++) {
+              events.push({title: data.success[i].first_name + " " + data.success[i].last_name, start: data.success[i].date.slice(0,11) + data.success[i].start, end: data.success[i].date.slice(0,11) + data.success[i].end, description: data.success[i].course_code + " " + data.success[i].course_name})
             }
-          }else {
-            console.log("No data found");
-            $("#calendar").empty();
+            loadCal(events);
+          }else{
+            console.log("no data returned");
           }
-          // if (response.success == true) {
-          //   console.log(response.success);
-          // }else{
-          //   console.log("error");
-          // }
         },
         error: function() {
           console.log("Error");
@@ -107,72 +49,36 @@
       });
     });
 
-
-
-
-
-
-
-
-
-    // $('#calendar').fullCalendar({
-    //   header: {
-    //     left: 'prev,next today',
-    //     center: 'title',
-    //     right: 'month,agendaWeek,agendaDay'
-    //   },
-    //   editable: true,
-    //   selectable: true,
-    //   selectHelper: true,
-    //   weekends: false,
-    //   height: 700,
-    //   minTime: "07:00:00",
-    //   maxTime: "21:00:00",
-    //   // slotDuration: '00:15:00',
-    //   defaultView: "agendaWeek",
-    //   eventColor: 'green',
-    //   events: [
-    //     {
-    //       title: "Tutor",
-    //       start: '2019-02-04T11:30:00',
-    //       end: '2019-02-04T18:30:00',
-    //       description: 'CMPS 480',
-    //       allDay: false
-    //     }
-    //   ],
-    //   eventAfterRender: function(event, elt, view ) {
-    //     var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
-    //     if(elt.find(".fc-event-title").length === 0) {
-    //       elt.find(".fc-event-time").text(formattedTime + " - " + event.title);
-    //     }else {
-    //       elt.find(".fc-event-time").text(formattedTime);
-    //     }
-    //      elt.find('.fc-title').after("<span>"+event.description+"</span>");
-    //   },
-    //   eventClick: function(eventObj) {
-    //     // redircect user to new page
-    //     if (eventObj.url) {
-    //       alert(
-    //         'Clicked ' + eventObj.title + '.\n' +
-    //         'Will open ' + eventObj.url + ' in a new tab'
-    //       );
-    //
-    //       window.open(eventObj.url);
-    //
-    //       return false; // prevents browser from following link in current tab.
-    //     } else {
-    //       // alert('Confirm Meeting ' + eventObj.title);
-    //       // $('#calendar').fullCalendar('removeEvents', event._id);
-    //     }
-    //   },
-    // });
+    function loadCal(evtArr) {
+      console.log(evtArr);
+      $('#calendar').fullCalendar({
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay'
+        },
+        editable: false,
+        selectable: false,
+        selectHelper: false,
+        weekends: false,
+        height: 800,
+        minTime: "07:00:00",
+        maxTime: "21:00:00",
+        defaultView: "agendaWeek",
+        eventColor: 'green',
+        events: evtArr,
+        eventAfterRender: function(event, elt, view ) {
+          var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
+          if(elt.find(".fc-event-title").length === 0) {
+            elt.find(".fc-event-time").text(formattedTime + " - " + event.title);
+          }else {
+            elt.find(".fc-event-time").text(formattedTime);
+          }
+          elt.find('.fc-title').after("<span>"+ event.description +"</span>");
+        }
+      });
+    }
   });
-
-
-
-
-
-
 
 </script>
 <form action="avaible_search"  method="POST" id="find_tutor">
@@ -180,16 +86,13 @@
   <div class="form-group row">
     <div class="col-8">
       <div class="input-group">
-        <input id="course_search" name="course_search" placeholder="Enter Course Code" type="text" class="form-control">
+        <input id="course_search" name="course_search" placeholder="CMPS 480" type="text" class="form-control">
         <div class="input-group-append">
-          <!-- <div class="input-group-text"> -->
-            <button name="submit" type="submit" class="btn btn-primary">Submit</button>
-          <!-- </div> -->
+          <button name="submit" type="submit" class="btn btn-primary">Submit</button>
         </div>
       </div>
     </div>
   </div>
-
 </form>
 
 <div id="calendar"></div>

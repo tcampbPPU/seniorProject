@@ -107,8 +107,11 @@ function getMenu(req) {
   var menu = [];
   var isAdmin = req.session.is_admin;
   var isTutor = req.session.is_tutor;
+  menu.push({"page": ".", "label": "Home"}, {"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
 
-  menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"});
+  /* HIDDING the rest for now*/
+  // menu.push({"page": ".", "label": "Home"}, {"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"},{"page": "tutor_list", "label": "Tutors"}, {"page": "tutor_view", "label": "Appointments"});
+
 
    // if (isTutor) {
    //   menu.push({"page": "student_view", "label": "Find Tutor"}, {"page": "student_log", "label": "Student Log"}, {"page": "schedule", "label": "Schedule"}, {"page": "skills_specialties", "label": "Skills/Specialties"});
@@ -206,6 +209,7 @@ app.get("/logout", function(req, res) {
 
 
 app.post("/login", function(req, res) {
+  // Will use Microsoft Authentication
   connect(function(con) {
     var errors = req.validationErrors();
     if (errors) {
@@ -222,6 +226,7 @@ app.post("/login", function(req, res) {
             var salt = result[0].salt;
             var passwordData = sha512(password, salt);
             if (result[0].password === passwordData.passwordHash) {
+              // need to use id for loading tutor appointments later
               req.session.user_id = result[0].id;
               req.session.is_admin = result[0].is_admin;
               req.session.is_admin = result[0].is_tutor;
@@ -229,7 +234,6 @@ app.post("/login", function(req, res) {
               req.session.cookie.maxAge = 9000000;
               res.send({success:true});
             }
-
           }
         });
       }catch (err) {
@@ -240,6 +244,7 @@ app.post("/login", function(req, res) {
 });
 
 
+// Presents user with a calendar view of avaible times given the course they entered
 app.post("/find_tutor", function(req, res) {
   connect(function(con) {
     var errors = req.validationErrors();
@@ -250,9 +255,10 @@ app.post("/find_tutor", function(req, res) {
       // TODO: Need to cross check with appointment table to see if tutor already has appointment, don't want to show that to user
       // Also check with current date so we arent not returning schedule from weeks ago
       // var date = new Date(); date.setDate(date.getDate() - 7); console.log(date.toLocaleString());
+      // Get user_id from req.session to match with a tutor
 
       var course = req.body.course_search;
-      var q = "select course.course_code, course.course_name, user.id, user.first_name, user.last_name, schedule.date, schedule.start, schedule.end from course left join tutor_has_course on course.id = tutor_has_course.course_id left join user on tutor_has_course.user_id = user.id left join schedule on user.id =  schedule.tutor_id where user.is_tutor = 1 and course_code = ?";
+      var q = "select course.course_code, course.course_name, user.id, user.first_name, user.last_name, schedule.date, schedule.start, schedule.end from course left join tutor_has_course on course.id = tutor_has_course.course_id left join user on tutor_has_course.user_id = user.id left join schedule on user.id = schedule.tutor_id where user.is_tutor = 1 and schedule.date > now() and course_code = ?";
       var values = [course];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -268,7 +274,6 @@ app.post("/find_tutor", function(req, res) {
             }
           }
         });
-
       }catch (err) {
         console.log(err, " Error in find_tutor.post function");
       }
@@ -276,12 +281,51 @@ app.post("/find_tutor", function(req, res) {
   });
 });
 
+// Loads a tutors appointments on page load
+app.post("/load_appointments", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var q = "select appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join tutor_has_course on user.course_id = tutor_has_course.course_id left join course on tutor_has_course.course_id = course.id where user.is_tutor != 1";
+      var values = req.session.user_id; // q += and where user.id = ? // and appointment.date >= now()
 
-app.post("/save_schedule", function(req, res) {
+      try {
+        con.query(q, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success:false});
+          }else {
+            if (result.length != 0) {
+              console.log(result);
+              res.send({success:result});
+            }
+            else {
+              res.send({success:false});
+            }
+          }
+        });
+
+      } catch (err) {
+        console.log(err, " Error in find_tutor.post function");
+      }
+    }
+  });
+});
+
+
+app.post("/confirm_appointments", function(req, res) {
+  // To confirm_appointment after the student selects the time they want with tutor
 
 });
 
 
+app.post("/save_schedule", function(req, res) {
+  // To be for saving a tutors schedule, currently doing it in sql
+
+});
 
 
 app.post("/student_log", function(req, res) {
@@ -317,31 +361,24 @@ app.post("/student_log", function(req, res) {
 
 
 app.post("/tutor_list", function(req, res) {
-  connect(function(con) {
-    var errors = req.validationErrors();
-    if (errors) {
-      req.session.errors = errors;
-      res.redirect(303, ".");
-    }else {
-      var fName = req.body.first_name;
-      var lName = req.body.last_name;
-      var subj = req.body.subject;
-      console.log(fName, lName, subj);
-      try {
-        // con.query(q, values, function (err, result, fields) {
-          // show list of tutors given search criteria
-
-
-        // });
-      } catch (err) {
-          console.log(err, " Error in tutor_list.post function");
-
-      }
-
-    }
-
-
-  });
+  // connect(function(con) {
+  //   var errors = req.validationErrors();
+  //   if (errors) {
+  //     req.session.errors = errors;
+  //     res.redirect(303, ".");
+  //   }else {
+  //     var fName = req.body.first_name;
+  //     var lName = req.body.last_name;
+  //     var subj = req.body.subject;
+  //     console.log(fName, lName, subj);
+  //     try {
+  //     } catch (err) {
+  //         console.log(err, " Error in tutor_list.post function");
+  //
+  //     }
+  //
+  //   }
+  // });
 });
 
 
