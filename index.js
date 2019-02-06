@@ -199,6 +199,15 @@ app.get('/tutor_list', function(req, res) {
   });
 });
 
+
+app.get('/create_appointment', function(req, res) {
+  res.render('create_appointment', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
+  });
+});
+
 app.get("/logout", function(req, res) {
   delete req.session.user_id;
   delete req.session.is_admin;
@@ -291,7 +300,6 @@ app.post("/load_appointments", function(req, res) {
     }else {
       var q = "select appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join tutor_has_course on user.course_id = tutor_has_course.course_id left join course on tutor_has_course.course_id = course.id where user.is_tutor != 1";
       var values = req.session.user_id; // q += and where user.id = ? // and appointment.date >= now()
-
       try {
         con.query(q, function (err, result, fields) {
           if (err) {
@@ -318,7 +326,61 @@ app.post("/load_appointments", function(req, res) {
 
 app.post("/confirm_appointments", function(req, res) {
   // To confirm_appointment after the student selects the time they want with tutor
+    connect(function(con) {
+      var errors = req.validationErrors();
+      if (errors) {
+        req.session.errors = errors;
+        res.redirect(303, ".");
+      }else {
+        // need to look up tutor id
+        var q_tutorID = "select user.id from user where is_tutor = 1"; // Need to use name in the search but, we will get there soon.
+        con.query(q_tutorID, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+          }else {
+            if (result.length != 0) {
+              // now can use the id to insert into appointment
+              var tutor_id = result[0].id
+              var q_courseID = "select course.id from course where course.course_code = ?";
+              var courseCode = req.body.course;
+              con.query(q_courseID, [courseCode],  function (err, result2, fields) {
+                if (err) {
+                  console.log(err);
+                }else {
+                  if (result2.length != 0) {
+                    // now can use the id to insert into appointment
+                    var course_id = result2[0].id;
+                    var q_insert = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`) values (?,?,?,?,?,?,?,?,?)";
+                    // var values = [req.session.user_id, tutor_id, req.body.date, req.body.start_time, req.body.end_time, '0', 'Math Center', '0', course_id];
+                    var values = ['7', tutor_id, '2019-02-09', '15:45:00', '16:00:00', '0', 'Math Center', '0', course_id];
+                    con.query(q_insert, values, function(err, result3, fields) {
+                      if (err) {
+                        console.log(err);
+                        res.send({success:false});
+                      } else {
+                        console.log(result3);
+                        res.send({success:true});
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
 
+
+
+        // var q = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`) values ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // var values = [req.body.user_id, req.body.first_name + req.body.first_name, req.body.start, req.body.end, 0 ,req.body.location, 0, req.body.description];
+        // var values = ['4', '3', '2019-02-06', '13:00:00', '16:00:00', '0', 'Math Center', '0', 'CMPS 480']
+        // left join out to user
+        // left join out to appointment_has_course
+        // left join out to course
+
+      }
+
+    });
 });
 
 

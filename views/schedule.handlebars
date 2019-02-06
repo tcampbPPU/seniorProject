@@ -75,9 +75,27 @@
             elt.find(".fc-event-time").text(formattedTime);
           }
           elt.find('.fc-title').after("<span>"+ event.description +"</span>");
-        }
+        },
+        eventClick: function(event) {
+           // console.log(event);
+           // var data = { 'first name': 'George', 'last name': 'Jetson', 'age': 110 };
+           var querystring = encodeQueryData(event);
+           // console.log(querystring);
+             location.assign("create_appointment?schedule_id="+ querystring);
+             // Can't you just use a URL parameter? `create_appointment?schedule_id=...` where `schedule_id` refers to the availability of a tutor (for a given date and start and end time). Or something like that.
+         }
       });
     }
+
+
+    function encodeQueryData(data) {
+      var ret = [];
+      for (let d in data)
+      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+      return ret.join('&');
+    }
+
+
   });
 
 </script>
