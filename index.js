@@ -45,6 +45,9 @@ app.use(require('express-session')({
  secret: credentials.cookieSecret
 }));
 
+
+
+
 /* DB Connection
  * USE connect(function(con){}); inside POST to call DB
 */
@@ -159,13 +162,13 @@ app.get('/tutor_view', function(req, res) {
 });
 
 // Redirect for admin, Gives full access to see all tutors as well as students. Also gives additional features
-app.get('/admin_view', function(req, res) {
-  res.render('admin_view', {
-    menu: getMenu(req),
-    login: req.session.user_id ? req.session.user_id : false,
-    user_name: req.session.user_first_name
-  });
-});
+// app.get('/admin_view', function(req, res) {
+//   res.render('admin_view', {
+//     menu: getMenu(req),
+//     login: req.session.user_id ? req.session.user_id : false,
+//     user_name: req.session.user_first_name
+//   });
+// });
 
 app.get('/student_log', function(req, res) {
   res.render('student_log', {
@@ -419,6 +422,22 @@ app.post("/student_log", function(req, res) {
   // });
   result = {student_id:"001", first_name:"First", last_name:"Last", date:"mm/dd/yyyy", time_in:"11:00", time_out:"14:00", duration:"3", subject:"CMPS 480", location:"Mat Center", tutor:"Tanner Campbell"};
   res.send({success:result});
+});
+
+//admin view routes and queries
+app.get("/admin_view", function(req, res) {
+  res.render("admin_view")
+});
+
+// connect(function(con){});
+
+app.post("/view_tutors", function(req, res) {
+  cb(con) {
+    var data = "SELECT * FROM tutor_list";
+    con.query(data);
+  });
+  res.send(data);
+
 });
 
 
