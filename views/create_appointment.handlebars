@@ -5,57 +5,39 @@
   }
 
 </style>
+{{#if login}}
 <script type="text/javascript">
+  // Confirmation Page to create an appointment with tutor
   $(function() {
-
-
-
-    $("#confirm").on('click', function() {
+    $("#confirm").on('click', function(e) {
       var urlParams = new URLSearchParams(window.location.search);
-      // Have to use schedule_id don't know why its being stupid
-      var description = urlParams.get('schedule_id').substring(12); //course code, course description
-      var title = urlParams.get('title'); // FirstName, LastName
-      var date = formatDate(urlParams.get('start').slice(0, 15))
-      var start = urlParams.get('start').slice(16, 24);
-      var end = urlParams.get('end').slice(16, 24);
-
       var data = {
-        // student_id: req.session.id, // can get in back end
-        tutor_id: title, // using name now to find our tutor id
-        date: date,
-        start_time: start,
-        end_time: end,
-        course: description.slice(0,8)
+        schedule_id: urlParams.get('schedule_id'),
+        tutor_id: urlParams.get('tutor_id'),
+        course_id: urlParams.get('course_id'),
+        date: urlParams.get('date'),
+        start: urlParams.get('start'),
+        end: urlParams.get('end')
       };
-      $.ajax({
-        type: 'post',
-        url: 'confirm_appointments',
-        data: data,
-        success: function(data) {
-          console.log(data, "we can move them to new page now!");
-          location.assign("tutor_view");
-        },
-        error: function() {
-          console.log("Error");
-        }
-        });
+      console.log(data);
+      // Commented out for now, works so far
+      // $.ajax({
+      //   type: 'post',
+      //   url: 'confirm_appointments',
+      //   data: data,
+      //   success: function(data) {
+      //     console.log(data, "we can move them to new page now!");
+      //     // location.assign("tutor_view");
+      //   },
+      //   error: function() {
+      //     console.log("Error");
+      //   }
+      //   });
       });
 
     $("#cancel").on('click', function() {
       location.assign("schedule");
     });
-
-    function formatDate(date) {
-      var d = new Date(date);
-      var month = '' + (d.getMonth() + 1);
-      var day = '' + d.getDate();
-      var year = d.getFullYear();
-
-      if (month.length < 2) month = '0' + month;
-      if (day.length < 2) day = '0' + day;
-
-      return [year, month, day].join('-');
-    }
   });
 
 </script>
@@ -65,3 +47,6 @@
   <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
   <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
 </div>
+{{else}}
+  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+{{/if}}

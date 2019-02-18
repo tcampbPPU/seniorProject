@@ -20,10 +20,10 @@
 
 
 </style>
-
+{{#if login}}
 <script type="text/javascript">
-  // Showing the Table to the Student
-  // https://fullcalendar.io/docs
+  // Shows a list of tutors and avaiblity given a course code input.
+  // Still working on not showing the already scheduled appointments
   $(function() {
     $('#find_tutor').on('submit', function(e) {
       e.preventDefault();
@@ -33,12 +33,23 @@
         data: $(this).serialize(),
         success: function(data) {
           if (data.success) {
+            console.log(data);
+            /*
             var evtCount = data.success.length;
             var events = [];
             for (var i = 0; i < evtCount; i++) {
-              events.push({title: data.success[i].first_name + " " + data.success[i].last_name, start: data.success[i].date.slice(0,11) + data.success[i].start, end: data.success[i].date.slice(0,11) + data.success[i].end, description: data.success[i].course_code + " " + data.success[i].course_name})
+              events.push({
+                schedule_id:data.success[i].schedule_id,
+                tutor_id:data.success[i].tutor_id,
+                course_id:data.success[i].course_id,
+                title: data.success[i].first_name + " " + data.success[i].last_name,
+                start: data.success[i].date.slice(0,11) + data.success[i].start,
+                end: data.success[i].date.slice(0,11) + data.success[i].end,
+                description: data.success[i].course_code + " " + data.success[i].course_name
+              })
             }
             loadCal(events);
+            */
           }else{
             console.log("no data returned");
           }
@@ -47,6 +58,8 @@
           console.log("Error");
         }
       });
+      // Should stop ajax from firing twice
+      return false;
     });
 
     function loadCal(evtArr) {
@@ -77,13 +90,17 @@
           elt.find('.fc-title').after("<span>"+ event.description +"</span>");
         },
         eventClick: function(event) {
-           // console.log(event);
-           // var data = { 'first name': 'George', 'last name': 'Jetson', 'age': 110 };
-           var querystring = encodeQueryData(event);
-           // console.log(querystring);
-             location.assign("create_appointment?schedule_id="+ querystring);
-             // Can't you just use a URL parameter? `create_appointment?schedule_id=...` where `schedule_id` refers to the availability of a tutor (for a given date and start and end time). Or something like that.
-         }
+           var date = formatDate(event.start._i.slice(0, 10));
+           var start = event.start._i.slice(11, 19);
+           var end = event.end._i.slice(11, 19);
+           var data = {'schedule_id': event.schedule_id, 'tutor_id': event.tutor_id, 'course_id': event.course_id, 'date': date, 'start': start, 'end': end};
+           var querystring = encodeQueryData(data);
+           console.log(querystring);
+           location.assign("create_appointment?" + querystring);
+         },
+        selectOverlap: function(event) {
+          return ! event.block;
+        }
       });
     }
 
@@ -92,7 +109,17 @@
       var ret = [];
       for (let d in data)
       ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-      return ret.join('&');
+      return "&" + ret.join('&');
+    }
+
+    function formatDate(date) {
+      var d = new Date(date);
+      var month = '' + (d.getMonth() + 1);
+      var day = '' + d.getDate();
+      var year = d.getFullYear();
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+      return [year, month, day].join('-');
     }
 
 
@@ -114,3 +141,7 @@
 </form>
 
 <div id="calendar"></div>
+
+{{else}}
+  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+{{/if}}
