@@ -48,6 +48,9 @@ app.use(require('express-session')({
  secret: credentials.cookieSecret
 }));
 
+
+
+
 /* DB Connection
  * USE connect(function(con){}); inside POST to call DB
 */
@@ -206,6 +209,7 @@ app.get('/tutor_view', function(req, res) {
     user_name: req.session.user_first_name
   });
 });
+
 
 app.get('/admin_view', function(req, res) {
   res.render('admin_view', {
@@ -565,6 +569,7 @@ app.post("/load_schedule", function(req, res) {
     }
   });
 });
+
 
 
 // Handles updating the tutors scedule
