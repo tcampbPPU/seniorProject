@@ -268,10 +268,9 @@ app.get("/admin_view", function(req, res) {
 // connect(function(con){});
 
 app.post("/view_tutors", function(req, res) {
-  cb(con) {
+  cb(con)
     var data = "SELECT * FROM tutor_list";
     con.query(data);
-  });
   res.send(data);
 
 });
