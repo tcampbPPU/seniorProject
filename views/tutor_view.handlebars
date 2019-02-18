@@ -20,9 +20,10 @@
   }
 
 </style>
+{{#if admin }}
+{{#if tutor }}
 <script type="text/javascript">
   // loads a calendar of appointments for a tutor
-  // get the tutors ID and load all upcomming appoints on a calender
   $(document).ready(function() {
   // tutor can only view thier appointments & Admin can view all
     $.ajax({
@@ -54,6 +55,7 @@
           center: 'title',
           right: 'month,agendaWeek,agendaDay'
         },
+        allDaySlot: false,
         editable: false,
         selectable: false,
         selectHelper: false,
@@ -61,6 +63,7 @@
         height: 800,
         minTime: "07:00:00",
         maxTime: "21:00:00",
+        slotDuration: '00:15:00',
         defaultView: "agendaWeek",
         eventColor: 'green',
         events: evtArr,
@@ -80,3 +83,8 @@
 
 </script>
 <div id="calendar"></div>
+
+{{else}}
+<center><h1>You are not allowed on this page, Please login as an admin or tutor.</h1></center>
+{{/ if}}
+{{/ if}}
