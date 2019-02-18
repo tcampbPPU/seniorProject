@@ -1,0 +1,72 @@
+<style media="screen">
+  #calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      /* width: 1200pt;
+      margin: auto;
+      margin-top: 20pt; */
+  }
+
+</style>
+{{#if admin }}
+{{#if tutor }}
+<script type="text/javascript">
+// This page allows the Tutor to have a interface to save their schedule
+// This page should load the current schedule and be able to add new events
+$(document).ready(function() {
+// tutor can only view thier appointments & Admin can view all
+  $.ajax({
+    type: 'post',
+    url:'load_schedule',
+    context: document.body,
+    success: function(data) {
+      if (data.success) {
+        var evtCount = data.success.length;
+        var events = [];
+        for (var i = 0; i < evtCount; i++) {
+          events.push({schedule_id: data.success[i].id, tutor_id: data.success[i].tutor_id,  start: data.success[i].date.slice(0,11) + data.success[i].start, end: data.success[i].date.slice(0,11) + data.success[i].end})
+        }
+        loadCal(events);
+      }else{
+        console.log("no data returned");
+      }
+    },
+    error: function() {
+      console.log("Error");
+    }
+  });
+
+  function loadCal(evtArr) {
+    console.log(evtArr);
+    $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      allDaySlot: false,
+      editable: true,
+      selectable: true,
+      selectHelper: true,
+      weekends: false,
+      height: 800,
+      minTime: "07:00:00",
+      maxTime: "21:00:00",
+      slotDuration: '00:15:00',
+      defaultView: "agendaWeek",
+      eventColor: 'green',
+      events: evtArr,
+      // TODO: Need to add ability to edit times && create new times
+      // ...
+      // Right now just load all the schedules manuaully entered in DB
+    });
+  }
+});
+
+</script>
+
+<div id="calendar"></div>
+{{else}}
+<center><h1>You are not allowed on this page, Please login as an admin or tutor.</h1></center>
+{{/ if}}
+{{/ if}}

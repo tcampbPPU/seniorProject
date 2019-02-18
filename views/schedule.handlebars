@@ -1,88 +1,147 @@
 <style media="screen">
-  #calendar {
-    width: 1200px;
-    margin: auto;
-    margin-top: 20pt;
+  .form-group {
+       padding: 20px;
   }
+
+  .input-group {
+       margin: 0 auto;
+       width: 250px;
+       align-content: center;
+
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      /* width: 1200pt;
+      margin: auto;
+      margin-top: 20pt; */
+  }
+
+
 </style>
-
+{{#if login}}
 <script type="text/javascript">
-  // https://fullcalendar.io/docs
+  // Shows a list of tutors and avaiblity given a course code input.
+  // Still working on not showing the already scheduled appointments
   $(function() {
-    // setTimeout(function() {}, 5000);
-    $('#calendar').fullCalendar({
-      selectable: true,
-      weekends: false,
-      height: 800,
-      header: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'month,agendaWeek,agendaDay'
-      },
-      // dayClick: function(date) {
-      //   alert('clicked ' + date.format());
-      // },
-      select: function(startDate, endDate) {
-        var events = [];
-            events.push({
-              start: startDate.format(),
-              end: endDate.format()
-              // title: meeting_title
-            });
-            console.log(events);
-
-        // alert('selected ' + startDate.format() + ' to ' + endDate.format());
-      }
+    $('#find_tutor').on('submit', function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'post',
+        url:'find_tutor',
+        data: $(this).serialize(),
+        success: function(data) {
+          if (data.success) {
+            console.log(data);
+            /*
+            var evtCount = data.success.length;
+            var events = [];
+            for (var i = 0; i < evtCount; i++) {
+              events.push({
+                schedule_id:data.success[i].schedule_id,
+                tutor_id:data.success[i].tutor_id,
+                course_id:data.success[i].course_id,
+                title: data.success[i].first_name + " " + data.success[i].last_name,
+                start: data.success[i].date.slice(0,11) + data.success[i].start,
+                end: data.success[i].date.slice(0,11) + data.success[i].end,
+                description: data.success[i].course_code + " " + data.success[i].course_name
+              })
+            }
+            loadCal(events);
+            */
+          }else{
+            console.log("no data returned");
+          }
+        },
+        error: function() {
+          console.log("Error");
+        }
+      });
+      // Should stop ajax from firing twice
+      return false;
     });
 
+    function loadCal(evtArr) {
+      console.log(evtArr);
+      $('#calendar').fullCalendar({
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay'
+        },
+        editable: false,
+        selectable: false,
+        selectHelper: false,
+        weekends: false,
+        height: 800,
+        minTime: "07:00:00",
+        maxTime: "21:00:00",
+        defaultView: "agendaWeek",
+        eventColor: 'green',
+        events: evtArr,
+        eventAfterRender: function(event, elt, view ) {
+          var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
+          if(elt.find(".fc-event-title").length === 0) {
+            elt.find(".fc-event-time").text(formattedTime + " - " + event.title);
+          }else {
+            elt.find(".fc-event-time").text(formattedTime);
+          }
+          elt.find('.fc-title').after("<span>"+ event.description +"</span>");
+        },
+        eventClick: function(event) {
+           var date = formatDate(event.start._i.slice(0, 10));
+           var start = event.start._i.slice(11, 19);
+           var end = event.end._i.slice(11, 19);
+           var data = {'schedule_id': event.schedule_id, 'tutor_id': event.tutor_id, 'course_id': event.course_id, 'date': date, 'start': start, 'end': end};
+           var querystring = encodeQueryData(data);
+           console.log(querystring);
+           location.assign("create_appointment?" + querystring);
+         },
+        selectOverlap: function(event) {
+          return ! event.block;
+        }
+      });
+    }
 
 
+    function encodeQueryData(data) {
+      var ret = [];
+      for (let d in data)
+      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+      return "&" + ret.join('&');
+    }
 
-
+    function formatDate(date) {
+      var d = new Date(date);
+      var month = '' + (d.getMonth() + 1);
+      var day = '' + d.getDate();
+      var year = d.getFullYear();
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+      return [year, month, day].join('-');
+    }
 
 
   });
 
-
-
-  // Fetch our events
-  // $.ajax({
-  //     url: "https://data.oregon.gov/resource/yid5-c4eq.json",
-  //   method: "GET",
-  //   datatype: "json",
-  //   data: {
-  //     "$where" : "start_date_time > '" + moment().subtract(31, 'days').format("YYYY-MM-DDT00:00:00") + "'",
-  //     "city" : "Portland",
-  //     "$order" : "start_date_time DESC"
-  //   }
-  // }).done(function(response) {
-  //   // Parse our events into an event object for FullCalendar
-  //   var events = [];
-  //   $.each(response, function(idx, e) {
-  //     events.push({
-  //       start: e.start_date_time,
-  //       end: e.end_date_time,
-  //       title: e.meeting_title,
-  //       url: e.web_link
-  //     });
-  //   });
-  //   $('#calendar').fullCalendar({
-  //     events: events
-  //   });
-  // });
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
+<form action="avaible_search"  method="POST" id="find_tutor">
+<form>
+  <div class="form-group row">
+    <div class="col-8">
+      <div class="input-group">
+        <input id="course_search" name="course_search" placeholder="CMPS 480" type="text" class="form-control">
+        <div class="input-group-append">
+          <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
 
 <div id="calendar"></div>
+
+{{else}}
+  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+{{/if}}

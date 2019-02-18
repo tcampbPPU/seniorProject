@@ -36,9 +36,9 @@
         success: function(response) {
           if (response.success == true) {
             console.log(response.success);
-            location.assign("student_view");
+            location.assign("schedule");
           }else{
-            alert("Incorrect Password!")
+            alert("Incorrect Password!");
           }
         },
         error: function() {
@@ -57,11 +57,11 @@
     <form action="login"  method="POST" id="login">
      <div class="form-group ">
       <label class="control-label " for="user">Username</label>
-       <input class="form-control" id="user" name="user" placeholder="PPU username" type="text"/>
+       <input class="form-control" id="user" name="user" placeholder="test" type="text"/>
      </div>
      <div class="form-group ">
       <label class="control-label " for="pwd">Password</label>
-       <input class="form-control" id="pwd" name="pwd" placeholder="password" type="password"/>
+       <input class="form-control" id="pwd" name="pwd" placeholder="Skip for now" type="password"/>
      </div>
      <div class="form-group">
       <div>

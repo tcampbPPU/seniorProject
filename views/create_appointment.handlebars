@@ -1,0 +1,52 @@
+<style media="screen">
+  button {
+    margin-left: 50pt;
+    margin-top: 50pt;
+  }
+
+</style>
+{{#if login}}
+<script type="text/javascript">
+  // Confirmation Page to create an appointment with tutor
+  $(function() {
+    $("#confirm").on('click', function(e) {
+      var urlParams = new URLSearchParams(window.location.search);
+      var data = {
+        schedule_id: urlParams.get('schedule_id'),
+        tutor_id: urlParams.get('tutor_id'),
+        course_id: urlParams.get('course_id'),
+        date: urlParams.get('date'),
+        start: urlParams.get('start'),
+        end: urlParams.get('end')
+      };
+      console.log(data);
+      // Commented out for now, works so far
+      // $.ajax({
+      //   type: 'post',
+      //   url: 'confirm_appointments',
+      //   data: data,
+      //   success: function(data) {
+      //     console.log(data, "we can move them to new page now!");
+      //     // location.assign("tutor_view");
+      //   },
+      //   error: function() {
+      //     console.log("Error");
+      //   }
+      //   });
+      });
+
+    $("#cancel").on('click', function() {
+      location.assign("schedule");
+    });
+  });
+
+</script>
+
+
+<div class="container-fluid">
+  <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
+  <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
+</div>
+{{else}}
+  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+{{/if}}

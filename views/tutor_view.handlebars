@@ -1,19 +1,90 @@
+<style media="screen">
+  .form-group {
+       padding: 20px;
+  }
+
+  .input-group {
+       margin: 0 auto;
+       width: 250px;
+       align-content: center;
+
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      margin-top: 20pt;
+      /* width: 1200pt;
+      margin: auto;
+       */
+  }
+
+</style>
+{{#if admin }}
+{{#if tutor }}
+<script type="text/javascript">
+  // loads a calendar of appointments for a tutor
+  $(document).ready(function() {
+  // tutor can only view thier appointments & Admin can view all
+    $.ajax({
+      type: 'post',
+      url:'load_appointments',
+      context: document.body,
+      success: function(data) {
+        if (data.success) {
+          var evtCount = data.success.length;
+          var events = [];
+          for (var i = 0; i < evtCount; i++) {
+            events.push({title: data.success[i].first_name + " " + data.success[i].last_name, start: data.success[i].date.slice(0,11) + data.success[i].start_time, end: data.success[i].date.slice(0,11) + data.success[i].end_time, description: data.success[i].course_code + " " + data.success[i].course_name})
+          }
+          loadCal(events);
+        }else{
+          console.log("no data returned");
+        }
+      },
+      error: function() {
+        console.log("Error");
+      }
+    });
+
+    function loadCal(evtArr) {
+      console.log(evtArr);
+      $('#calendar').fullCalendar({
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay'
+        },
+        allDaySlot: false,
+        editable: false,
+        selectable: false,
+        selectHelper: false,
+        weekends: false,
+        height: 800,
+        minTime: "07:00:00",
+        maxTime: "21:00:00",
+        slotDuration: '00:15:00',
+        defaultView: "agendaWeek",
+        eventColor: 'green',
+        events: evtArr,
+        eventAfterRender: function(event, elt, view ) {
+          var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
+          if(elt.find(".fc-event-title").length === 0) {
+            elt.find(".fc-event-time").text(formattedTime + " - " + event.title);
+          }else {
+            elt.find(".fc-event-time").text(formattedTime);
+          }
+          elt.find('.fc-title').after("<span>"+ event.description +"</span>");
+        }
+      });
+    }
+  });
 
 
+</script>
+<div id="calendar"></div>
 
-
-
-
-
-
-
-<body>
-  <h2>Tutor Page</h2>
-  <h4>Option to continue as tutor or switch to student view</h4>
-  <ul>
-    <li>Select course specialties</li>
-    <li>Edit scheulue with days and hours of aviabilty</li>
-    <li>Monitor Students which they have tutored</li>
-    <li>Start students tutoing session</li>
-  </ul>
-</body>
+{{else}}
+<center><h1>You are not allowed on this page, Please login as an admin or tutor.</h1></center>
+{{/ if}}
+{{/ if}}
