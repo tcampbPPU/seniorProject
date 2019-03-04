@@ -33,7 +33,7 @@
 ### Enrique (Student)
 * I have never used the Point Park’s tutor website.
 * The page design is consistent, and it is easy to understand and respond.
-* A student survey popup after making schedules to get feedback from them would be nice.
+* A student survey popup after making appointments to get feedback from them would be nice.
 
 
 ### Anil (Student)
