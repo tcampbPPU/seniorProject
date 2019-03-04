@@ -11,7 +11,7 @@
 ### Paul/Kevin (Tutors)
 * Students are not available to schedule 1-1 appointments with them.
 * Student has to meet with Michael (Or differnt admin) to have him set appointment
-* Went Student signs into iPad There courses often do not show up
+* When Student signs into kiosks thier courses often do not show up
 * Selecting certified courses is very tedious - still shows courses from past years & semesters
 * Log view of past/previous appointments does not work - No easy way to read back save and create notes on students
 * Being able to view Appointments on calendar is nice already
