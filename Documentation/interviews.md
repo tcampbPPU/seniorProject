@@ -24,7 +24,7 @@
 
 
 ## ABI
-### Zach (Student)
+### Zachary (Student)
 * The contents of this website are readable unlike the current tutor track website.
 * It would be nice if the website is scalable with various resolutions and web browsers.
 * I think color is very important and fun bright colors can make a page exciting.
