@@ -24,11 +24,23 @@
 
 
 ## ABI
-### Person 1
+### Zachary (Student)
+* The contents of this website are readable unlike the current tutor track website.
+* It would be nice if the website is scalable with various resolutions and web browsers.
+* I think color is very important and fun bright colors can make a page exciting.
 
-### Person 2
 
-### Person 3
+### Enrique (Student)
+* I have never used the Point Park’s tutor website.
+* The page design is consistent, and it is easy to understand and respond.
+* A student survey popup after making appointments to get feedback from them would be nice.
+
+
+### Anil (Student)
+* The list of tutors shown on tutor track are not categorized and it is hard to figure out their departments.
+* Choosing a specific time for appointment every 30 minutes is great.
+* The main page is already nice here, it is clear for students what the next step is.
+
 
 
 ## Sheree
