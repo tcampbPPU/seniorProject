@@ -42,7 +42,7 @@ or
 * Triggers: Student request tutor in a given course
 * Basic flow:
 * 1.	Student enters a course code.
-* 2.     Calendar gets generated with a list of tutors and open times slots.
+* 2.  Calendar gets generated with a list of tutors and open times slots.
 * Extensions: 
 API:
 {
