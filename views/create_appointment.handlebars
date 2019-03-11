@@ -14,25 +14,23 @@
       var data = {
         schedule_id: urlParams.get('schedule_id'),
         tutor_id: urlParams.get('tutor_id'),
-        course_id: urlParams.get('course_id'),
         date: urlParams.get('date'),
         start: urlParams.get('start'),
         end: urlParams.get('end')
       };
       console.log(data);
-      // Commented out for now, works so far
-      // $.ajax({
-      //   type: 'post',
-      //   url: 'confirm_appointments',
-      //   data: data,
-      //   success: function(data) {
-      //     console.log(data, "we can move them to new page now!");
-      //     // location.assign("tutor_view");
-      //   },
-      //   error: function() {
-      //     console.log("Error");
-      //   }
-      //   });
+      $.ajax({
+        type: 'post',
+        url: 'confirm_appointments',
+        data: data,
+        success: function(data) {
+          console.log(data);
+          location.assign("schedule");
+        },
+        error: function() {
+          console.log("Error");
+        }
+        });
       });
 
     $("#cancel").on('click', function() {
@@ -48,5 +46,5 @@
   <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
 </div>
 {{else}}
-  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+  <h1 align="center">You need to login to view this page.</h1>
 {{/if}}

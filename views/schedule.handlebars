@@ -32,26 +32,25 @@
         url:'find_tutor',
         data: $(this).serialize(),
         success: function(data) {
-          if (data.success) {
-            console.log(data);
-            /*
+          if (data.success != false) {
+            $("calendar").show();
+            // prepareIntervals
             var evtCount = data.success.length;
             var events = [];
             for (var i = 0; i < evtCount; i++) {
+
               events.push({
-                schedule_id:data.success[i].schedule_id,
-                tutor_id:data.success[i].tutor_id,
-                course_id:data.success[i].course_id,
-                title: data.success[i].first_name + " " + data.success[i].last_name,
+                schedule_id: data.success[i].schedule_id,
+                tutor_id: data.success[i].tutor_id,
                 start: data.success[i].date.slice(0,11) + data.success[i].start,
-                end: data.success[i].date.slice(0,11) + data.success[i].end,
-                description: data.success[i].course_code + " " + data.success[i].course_name
-              })
+                end: data.success[i].date.slice(0,11) + data.success[i].end
+              });
             }
+            console.log(events);
             loadCal(events);
-            */
           }else{
             console.log("no data returned");
+            $("calendar").remove();
           }
         },
         error: function() {
@@ -63,13 +62,13 @@
     });
 
     function loadCal(evtArr) {
-      console.log(evtArr);
       $('#calendar').fullCalendar({
         header: {
           left: 'prev,next today',
           center: 'title',
           right: 'month,agendaWeek,agendaDay'
         },
+        allDaySlot: false,
         editable: false,
         selectable: false,
         selectHelper: false,
@@ -90,12 +89,18 @@
           elt.find('.fc-title').after("<span>"+ event.description +"</span>");
         },
         eventClick: function(event) {
-           var date = formatDate(event.start._i.slice(0, 10));
+           var date = event.start._i.slice(0, 10);
            var start = event.start._i.slice(11, 19);
            var end = event.end._i.slice(11, 19);
-           var data = {'schedule_id': event.schedule_id, 'tutor_id': event.tutor_id, 'course_id': event.course_id, 'date': date, 'start': start, 'end': end};
+           var data = {
+             'schedule_id': event.schedule_id,
+             'tutor_id': event.tutor_id,
+             'date': date,
+             'start': start,
+             'end': end
+             // 'course_id': event.course_id,
+           };
            var querystring = encodeQueryData(data);
-           console.log(querystring);
            location.assign("create_appointment?" + querystring);
          },
         selectOverlap: function(event) {
@@ -143,5 +148,5 @@
 <div id="calendar"></div>
 
 {{else}}
-  <h1>sorry, you are not allowed to view this page now, please log in </h1>
+  <h1 align="center">You need to login to view this page.</h1>
 {{/if}}
