@@ -44,7 +44,7 @@
 
 
 ## Sheree
-### Brandon (student)
+### Brandon  (student)
 * Notification for reminders before tutor session start 
 * Being able to leave comments of questions students may have thats not able to make it to the tutor sessions.
 * Only being able to see only current courses that offer tutoring sessions. 
