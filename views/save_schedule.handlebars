@@ -1,4 +1,26 @@
 <style media="screen">
+
+  #external-events {
+    position: fixed;
+    z-index: 2;
+    top: 80px;
+    left: 40px;
+    width: 150px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    background: #eee;
+  }
+
+  #external-events .fc-event {
+    margin: 1em 0;
+    cursor: move;
+  }
+
+  #calendar {
+    max-width: 900px;
+    margin: 20px auto;
+  }
+
   #calendar {
       max-width: 900px;
       margin: 0 auto;
@@ -13,8 +35,46 @@
 <script type="text/javascript">
 // This page allows the Tutor to have a interface to save their schedule
 // This page should load the current schedule and be able to add new events
-$(document).ready(function() {
+
+  $(document).ready(function() {
+    // $('#calendar').fullCalendar({
+    //   header: {
+    //     left: 'prev,next today',
+    //     center: 'title',
+    //     right: 'month,agendaWeek,agendaDay'
+    //   },
+    //   allDaySlot: false,
+    //   editable: false,
+    //   selectable: false,
+    //   selectHelper: false,
+    //   weekends: false,
+    //   height: 800,
+    //   minTime: "07:00:00",
+    //   maxTime: "21:00:00",
+    //   defaultView: "agendaWeek",
+    //   eventColor: 'green'
+    //
+    // });
+    //
+    // $('.fc-event').fullCalendar({
+    //
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
+
 // tutor can only view thier appointments & Admin can view all
+
+
   $.ajax({
     type: 'post',
     url:'load_schedule',
@@ -61,12 +121,18 @@ $(document).ready(function() {
       // Right now just load all the schedules manuaully entered in DB
     });
   }
-});
+  });
 
 </script>
+<div id='external-events'>
+  <p>
+    <strong>Draggable Events</strong>
+  </p>
+  <div class='fc-event'>My Event 1</div>
+</div>
 
 <div id="calendar"></div>
 {{else}}
-<center><h1>You are not allowed on this page, Please login as an admin or tutor.</h1></center>
+<h1 align="center">You need to login to view this page.</h1>
 {{/ if}}
 {{/ if}}

@@ -35,7 +35,12 @@
           var evtCount = data.success.length;
           var events = [];
           for (var i = 0; i < evtCount; i++) {
-            events.push({title: data.success[i].first_name + " " + data.success[i].last_name, start: data.success[i].date.slice(0,11) + data.success[i].start_time, end: data.success[i].date.slice(0,11) + data.success[i].end_time, description: data.success[i].course_code + " " + data.success[i].course_name})
+            events.push({
+              title: data.success[i].first_name + " " + data.success[i].last_name,
+              start: data.success[i].date.slice(0,11) + data.success[i].start_time,
+              end: data.success[i].date.slice(0,11) + data.success[i].end_time,
+              description: data.success[i].course_code
+            });
           }
           loadCal(events);
         }else{
@@ -85,6 +90,6 @@
 <div id="calendar"></div>
 
 {{else}}
-<center><h1>You are not allowed on this page, Please login as an admin or tutor.</h1></center>
+<h1 align="center">You need to login to view this page.</h1>
 {{/ if}}
 {{/ if}}
