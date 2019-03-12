@@ -1,0 +1,51 @@
+<style media="screen">
+  button {
+    margin-left: 50pt;
+    margin-top: 50pt;
+  }
+
+</style>
+{{#if login}}
+<script type="text/javascript">
+  // Confirmation Page to create an appointment with tutor
+  $(function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var data = {
+      appointment_id: urlParams.get('id')
+    };
+    $.ajax({
+      type: 'post',
+      url: 'view_appts_more_detail',
+      data: data,
+      success: function(data) {
+        $("#date").text(data.success[0].date.slice(0,10));
+        $("#start_time").text(data.success[0].start_time);
+        $("#end_time").text(data.success[0].end_time);
+        $("#notes").text(data.success[0].notes != null ? data.success[0].notes : "No Notes for this appointment.");
+        $("#first_name").text(data.success[0].first_name);
+        $("#last_name").text(data.success[0].last_name);
+        $("#course_code").text(data.success[0].course_code);
+        $("#course_name").text(data.success[0].course_name);
+      },
+      error: function() {
+        console.log("Error");
+      }
+    });
+  });
+
+</script>
+<div class="container">
+
+  <span>Date:  <p id="date" style="display:inline;"></p></span> <br>
+  <span>Time In:  <p id="start_time" style="display:inline;"></p></span> <br>
+  <span>Time Out:  <p id="end_time" style="display:inline;"></p></span> <br>
+  <span>Notes:  <p id="notes" style="display:inline;"></p></span> <br>
+  <span>First Name:  <p id="first_name" style="display:inline;"></p></span> <br>
+  <span>Last Name:  <p id="last_name" style="display:inline;"></p></span> <br>
+  <span>Course Code:  <p id="course_code" style="display:inline;"></p></span> <br>
+  <span>Course Name:  <p id="course_name" style="display:inline;"></p></span>
+</div>
+
+{{else}}
+  <h1 align="center">You need to login to view this page.</h1>
+{{/if}}
