@@ -32,10 +32,12 @@
       context: document.body,
       success: function(data) {
         if (data.success) {
+          console.log(data);
           var evtCount = data.success.length;
           var events = [];
           for (var i = 0; i < evtCount; i++) {
             events.push({
+              appointment_id: data.success[i].appointment_id,
               title: data.success[i].first_name + " " + data.success[i].last_name,
               start: data.success[i].date.slice(0,11) + data.success[i].start_time,
               end: data.success[i].date.slice(0,11) + data.success[i].end_time,
@@ -80,9 +82,26 @@
             elt.find(".fc-event-time").text(formattedTime);
           }
           elt.find('.fc-title').after("<span>"+ event.description +"</span>");
+        },
+        eventClick: function(event) {
+          var data = {
+          'id': event.appointment_id
+          };
+          var querystring = encodeQueryData(data);
+          location.assign("view_appointment?" + querystring);
         }
       });
     }
+
+
+    function encodeQueryData(data) {
+      var ret = [];
+      for (let d in data)
+      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+      return ret.join('&');
+    }
+
+
   });
 
 

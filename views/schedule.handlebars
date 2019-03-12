@@ -38,9 +38,9 @@
             var evtCount = data.success.length;
             var events = [];
             for (var i = 0; i < evtCount; i++) {
-
               events.push({
                 schedule_id: data.success[i].schedule_id,
+                course_id: data.success[i].course_id,
                 tutor_id: data.success[i].tutor_id,
                 start: data.success[i].date.slice(0,11) + data.success[i].start,
                 end: data.success[i].date.slice(0,11) + data.success[i].end
@@ -94,6 +94,7 @@
            var end = event.end._i.slice(11, 19);
            var data = {
              'schedule_id': event.schedule_id,
+             'course_id': event.course_id,
              'tutor_id': event.tutor_id,
              'date': date,
              'start': start,

@@ -13,10 +13,12 @@
       var urlParams = new URLSearchParams(window.location.search);
       var data = {
         schedule_id: urlParams.get('schedule_id'),
+        course_id: urlParams.get('course_id'),
         tutor_id: urlParams.get('tutor_id'),
         date: urlParams.get('date'),
         start: urlParams.get('start'),
-        end: urlParams.get('end')
+        end: urlParams.get('end'),
+        notes: $("#notes").val()
       };
       console.log(data);
       $.ajax({
@@ -44,6 +46,10 @@
 <div class="container-fluid">
   <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
   <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
+  <div class="form-group">
+    <label for="notes">Enter some notes...</label>
+    <textarea class="form-control" id="notes" rows="3" placeholder="Leave a note for your appointment..."></textarea>
+</div>
 </div>
 {{else}}
   <h1 align="center">You need to login to view this page.</h1>

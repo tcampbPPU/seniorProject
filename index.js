@@ -157,6 +157,16 @@ app.get('/create_appointment', function(req, res) {
   });
 });
 
+
+app.get('/view_appointment', function(req, res) {
+  res.render('view_appointment', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name
+  });
+});
+
+
 // Page that shows the appointments to a tutor
 app.get('/tutor_view', function(req, res) {
   if(req.session.is_tutor) {
@@ -167,7 +177,6 @@ app.get('/tutor_view', function(req, res) {
        login: req.session.user_id ? req.session.user_id : false,
        user_name: req.session.user_first_name,
      });
-       console.log(req.session.user_id);
   }else {
     res.redirect(303, ".");
   }
@@ -409,7 +418,8 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
        var tmpend = start + (j + 1) * 1800000;
         if (last_end_time != appt[i].start) {
           data.push({
-            schedule_id: appt[i].schedule_id,
+            schedule_id: schedule.schedule_id,
+            course_id: schedule.course_id,
             tutor_id: appt[i].tutor_id,
             date: appt[i].date,
             start: msToTime(tmpstart),
@@ -445,7 +455,7 @@ app.post("/load_appointments", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var q = "select appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
+      var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
       var values = [req.session.user_id];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -484,9 +494,9 @@ app.post("/confirm_appointments", function(req, res) {
       var date = req.body.date;
       var start = req.body.start;
       var end = req.body.end;
-      var q = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`) values (?,?,?,?,?,?,?,?,?)";
-      var values = [req.session.user_id, tutor_id, date, start, end, '0', 'Math Center', '0', course_id];
-      // var values = ['9', tutor_id, date, start, end, '0', 'Math Center', '0', course_id];
+      var notes = req.body.notes;
+      var q = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`, `notes`) values (?,?,?,?,?,?,?,?,?,?)";
+      var values = [req.session.user_id, tutor_id, date, start, end, '0', 'Math Center', '0', course_id, notes];
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
@@ -498,12 +508,40 @@ app.post("/confirm_appointments", function(req, res) {
           }
         });
       }catch (err) {
-        console.log(err, "Error while trying to save appointment -> app.post.confirm_appointments");
+        console.log(err, "Error app.post.confirm_appointments");
       }
     }
-
   });
 });
+
+// TODO: To handle the notes created on confirm_appointments
+
+
+app.post("/view_appts_more_detail", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var q = "select appointment.id, appointment.date, appointment.start_time, appointment.end_time, appointment.notes, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join course on appointment.course_id = course.id where appointment.id = ?";
+      var values = [req.body.appointment_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            res.send({success: result});
+          }
+        });
+      }catch (err) {
+        console.log(err, "Error app.post.view_appts_more_detail");
+      }
+    }
+  });
+});
+
 
 // Handles loading the tutors schedule calendar
 app.post("/load_schedule", function(req, res) {
