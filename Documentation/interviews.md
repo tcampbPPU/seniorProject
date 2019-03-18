@@ -73,5 +73,5 @@
 * Would not know how to reach the website if they needed help finding a tutor. Alternative would be to search Point Park main website
 * Suggested to add tutor bio that shows their courses of expertise
 * Suggested a link within Schoology that can take you directly to the tutor scheduling website.
-* Should be able to view a calendar of availability
+* Should be able to view a calendar of availability.
 
