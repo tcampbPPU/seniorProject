@@ -53,8 +53,25 @@
 
 ## Edwin
 
-### Person 1
+### Tim (Student)
+* Has not heard of or used Point Park's tutor website up until our meeting.
+* ‚Buttons that do not function, lots of white space, and overall poor user experience.
+* Would like to be able to quickly view available tutors and time slots in a few steps as possible
+* Be able to give feedback from the appointment with a tutor
+‚*Be able to reschedule
+* Site should be secure as it will process user/password information
 
-### Person 2
+### Maish (Student)
+* Has not heard of or used Point Park's tutor website and would not know how to find it other than searching Point Park' main website. However, student is aware of tutoring services offered at the Center for Student Success.
+* Poor user experience with TutorTrac, unresponsive buttons, not appealing, lots of white space, and lack of navigation ability.
+* Would like a site that functions as it should be with responsive buttons, not confusing, no redundancy.
+* Add pictures that are appealing to the user/student. Like cartoon, books, students, tutors for example
+* Add a help feature in case a user needs help with a certain feature of the website. Or even a chat feature that a user can interact with support staff for the website.
 
-### Person 3
+### Sam (Student)
+* Also has not heard of TutorTrac, Point Park' Tutor site, until mentioning it on our meeting.
+* Would not know how to reach the website if they needed help finding a tutor. Alternative would be to search Point Park main website
+* Suggested to add tutor bio that shows their courses of expertise
+* Suggested a link within Schoology that can take you directly to the tutor scheduling website.
+* Should be able to view a calendar of availability.
+
