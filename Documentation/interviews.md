@@ -44,11 +44,21 @@
 
 
 ## Sheree
-### Person 1
+### Brandon  (student)
+* Notification for reminders before tutor session start 
+* Being able to leave comments of questions students may have thats not able to make it to the tutor sessions.
+* Only being able to see only current courses that offer tutoring sessions. 
 
-### Person 2
+### Nani (tutor)
+* Does not have to many problems with the current system, that she would change
+* Sometimes she have to keep clicking 
+* Being able to have feedback box  about the vist. 
 
-### Person 3
+### Kevin (student)
+* User friendly 
+* Being able to see that the appointment has been confirmend.
+* More appealing to students 
+* Having a link on the pointpark website that directs you to the page to schedule sessions. 
 
 
 ## Edwin
