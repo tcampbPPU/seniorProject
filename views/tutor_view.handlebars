@@ -20,19 +20,20 @@
   }
 
 </style>
-{{#if admin }}
-{{#if tutor }}
+{{#if login}}
 <script type="text/javascript">
-  // loads a calendar of appointments for a tutor
-  $(document).ready(function() {
-  // tutor can only view thier appointments & Admin can view all
+  $(function() {
+    console.log({{login}});
+    var data = {
+      user_id : {{login}}
+    }
+
     $.ajax({
       type: 'post',
       url:'load_appointments',
-      context: document.body,
+      data: data,
       success: function(data) {
         if (data.success) {
-          console.log(data);
           var evtCount = data.success.length;
           var events = [];
           for (var i = 0; i < evtCount; i++) {
@@ -110,5 +111,4 @@
 
 {{else}}
 <h1 align="center">You need to login to view this page.</h1>
-{{/ if}}
-{{/ if}}
+{{/if}}

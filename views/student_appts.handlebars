@@ -1,0 +1,33 @@
+<style media="screen">
+  .form-group {
+       padding: 20px;
+  }
+
+  .input-group {
+       margin: 0 auto;
+       width: 250px;
+       align-content: center;
+
+  }
+
+  #calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      margin-top: 20pt;
+      /* width: 1200pt;
+      margin: auto;
+       */
+  }
+
+</style>
+{{#if login }}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      alert("Working");
+
+    });
+  </script>
+    <div id="calendar"></div>
+  {{else}}
+  <h1 align="center">You need to login to view this page.</h1>
+{{/ if}}
