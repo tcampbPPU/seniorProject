@@ -23,7 +23,8 @@
 {{#if login}}
 <script type="text/javascript">
   $(function() {
-    console.log({{login}});
+
+    // User id data
     var data = {
       user_id : {{login}}
     }
@@ -75,6 +76,7 @@
         defaultView: "agendaWeek",
         eventColor: 'green',
         events: evtArr,
+        eventTextColor: 'black',
         eventAfterRender: function(event, elt, view ) {
           var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
           if(elt.find(".fc-event-title").length === 0) {
