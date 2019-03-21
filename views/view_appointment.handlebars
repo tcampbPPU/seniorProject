@@ -31,19 +31,40 @@
         console.log("Error");
       }
     });
+    var is_tutor = {{tutor}};
+    if(is_tutor == 1) {
+      $("#info").append($('<textarea style="padding-left:0px" />'));
+      var button = $("<br/>" + "<button>");
+      $("#info").append(button);
+      button.html('Save');
+      // $("textarea").on('keyup change', function(e) {
+      $("button").on('click', function(e) {
+        // if (e.which == 220) return false;
+        console.log($('textarea').val());
+        // Need to render previous notes data if exists,
+        // ...
+        // and send need notes, or updates back to db
+        // ...
+        // might want to use a submit btn instead of on change
+      });
+
+    }
   });
 
 </script>
-<div class="container">
 
+<div class="container" id="info">
+  <h3>Appointment info</h3>
   <span>Date:  <p id="date" style="display:inline;"></p></span> <br>
   <span>Time In:  <p id="start_time" style="display:inline;"></p></span> <br>
   <span>Time Out:  <p id="end_time" style="display:inline;"></p></span> <br>
-  <span>Notes:  <p id="notes" style="display:inline;"></p></span> <br>
+  <span>Student Notes:  <p id="notes" style="display:inline;"></p></span> <br>
   <span>First Name:  <p id="first_name" style="display:inline;"></p></span> <br>
   <span>Last Name:  <p id="last_name" style="display:inline;"></p></span> <br>
   <span>Course Code:  <p id="course_code" style="display:inline;"></p></span> <br>
-  <span>Course Name:  <p id="course_name" style="display:inline;"></p></span>
+  <span>Course Name:  <p id="course_name" style="display:inline;"></p></span> <br>
+  <!-- <label for="appts_notes" class="appts_notes">Appointment Notes: </label>
+  <textarea rows="20" cols="150" class="appts_notes" name="appts_notes"></textarea> -->
 </div>
 
 {{else}}

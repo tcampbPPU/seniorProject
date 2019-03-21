@@ -111,15 +111,18 @@ var sha512 = function(password, salt){
 
 function getMenu(req) {
   var menu = [];
-  menu.push({"page": ".", "label": "Home"});
-
-  if (req.session.user_id) {
-    menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
+  if (!req.session.user_id) {
+    menu.push({"page": ".", "label": "Login"});
   }
-  if (req.session.is_admin || req.session.is_tutor) {
-    menu.push({"page": "save_schedule", "label": "Create Schedule"});
+  else {
+    menu.pop();
+    if (req.session.user_id) {
+      menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
+    }
+    if (req.session.is_admin || req.session.is_tutor) {
+      menu.push({"page": "save_schedule", "label": "Create Schedule"});
+    }
   }
-
   return menu;
 };
 
@@ -162,7 +165,8 @@ app.get('/view_appointment', function(req, res) {
   res.render('view_appointment', {
     menu: getMenu(req),
     login: req.session.user_id ? req.session.user_id : false,
-    user_name: req.session.user_first_name
+    user_name: req.session.user_first_name,
+    tutor: req.session.is_tutor
   });
 });
 
@@ -469,7 +473,7 @@ app.post("/load_appointments", function(req, res) {
     }else {
       if (req.session.is_tutor == 0) {
         // query for student
-        var q = "select appointment.id as appointment_id,appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.tutor_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.student_id = ?";
+        var q = "select appointment.id as appointment_id,appointment.date, appointment.start_time, appointment.end_time, appointment.location, appointment.notes, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.tutor_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.student_id = ?";
       }else {
         // query for tutor
         var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
@@ -630,15 +634,22 @@ app.post("/save_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "insert into schedule (schedule.tutor_id, schedule.date, schedule.start, schedule.end) values (?, ?, ?, ?)";
-      var values = [req.session.user_id, req.body.date, req.body.start, req.body.end];
+      var tutor_id = req.session.user_id;
+      var course = req.body.course;
+      var dateElements = req.body.start_time.slice(0,10).split("/");
+      var date = dateElements[2]+ '-' +dateElements[0]+ '-' +dateElements[1];
+      var start_time = ConvertTimeformat(req.body.start_time.slice(11,19)) + ":00";
+      var end_time = ConvertTimeformat(req.body.end_time.slice(11,19)) + ":00";
+      var values = [tutor_id, date, start_time, end_time];
+      console.log(values);
       try {
-        con.query(q, [values], function (err, result, fields) {
+        con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            // res.send({success: false});
+            res.send({success: false});
           }else {
-            // result
             console.log(result);
+            res.send({success: true});
           }
         });
       }catch (err) {
@@ -689,3 +700,17 @@ function msToTime(duration) {
 
   return hours + ":" + minutes + ":" + seconds;
 }
+
+  function ConvertTimeformat(time) {
+  var format = "24";
+  var hours = Number(time.match(/^(\d+)/)[1]);
+  var minutes = Number(time.match(/:(\d+)/)[1]);
+  var AMPM = time.match(/\s(.*)$/)[1];
+  if (AMPM == "PM" && hours < 12) hours = hours + 12;
+  if (AMPM == "AM" && hours == 12) hours = hours - 12;
+  var sHours = hours.toString();
+  var sMinutes = minutes.toString();
+  if (hours < 10) sHours = "0" + sHours;
+  if (minutes < 10) sMinutes = "0" + sMinutes;
+    return sHours + ":" + sMinutes;
+  }
