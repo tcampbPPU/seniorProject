@@ -9,10 +9,16 @@
 <script type="text/javascript">
   // Confirmation Page to create an appointment with tutor
   $(function() {
+
+
+
+
+
     var urlParams = new URLSearchParams(window.location.search);
     var data = {
       appointment_id: urlParams.get('id')
     };
+    console.log(data.appointment_id);
     $.ajax({
       type: 'post',
       url: 'view_appts_more_detail',
@@ -26,29 +32,40 @@
         $("#last_name").text(data.success[0].last_name);
         $("#course_code").text(data.success[0].course_code);
         $("#course_name").text(data.success[0].course_name);
+        var is_tutor = {{tutor}};
+        if(is_tutor == 1) {
+          $("#info").append($('<textarea style="padding-left:0px" />'));
+          $('textarea').text(data.success[0].tutor_notes);
+          var button = $("<br/>" + "<button>");
+          $("#info").append(button);
+          button.html('Save');
+          // $("textarea").on('keyup change', function(e) {
+          $("button").on('click', function(e) {
+            if (e.which == 220) return false;
+            var updatedNote = {
+              id: urlParams.get('id'),
+              note: $('textarea').val()
+            };
+            $.ajax({
+              type: 'post',
+              url: 'update_tutor_note',
+              data: updatedNote,
+              success: function(resp) {
+                console.log(resp);
+                location.assign("tutor_view");
+              },
+              error: function() {
+                console.log("Error");
+              }
+            });
+          });
+        }
       },
       error: function() {
         console.log("Error");
       }
     });
-    var is_tutor = {{tutor}};
-    if(is_tutor == 1) {
-      $("#info").append($('<textarea style="padding-left:0px" />'));
-      var button = $("<br/>" + "<button>");
-      $("#info").append(button);
-      button.html('Save');
-      // $("textarea").on('keyup change', function(e) {
-      $("button").on('click', function(e) {
-        // if (e.which == 220) return false;
-        console.log($('textarea').val());
-        // Need to render previous notes data if exists,
-        // ...
-        // and send need notes, or updates back to db
-        // ...
-        // might want to use a submit btn instead of on change
-      });
 
-    }
   });
 
 </script>
