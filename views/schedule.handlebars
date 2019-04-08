@@ -1,13 +1,9 @@
 <style media="screen">
-  .form-group {
-       padding: 20px;
-  }
 
   .input-group {
-       margin: 0 auto;
-       width: 250px;
-       align-content: center;
-
+    margin-left: 85%;
+    width: 250px;
+    padding: 10px;
   }
 
   #calendar {
@@ -25,6 +21,7 @@
   // Shows a list of tutors and avaiblity given a course code input.
   // Still working on not showing the already scheduled appointments
   $(function() {
+    console.log({{login}});
     $('#find_tutor').on('submit', function(e) {
       e.preventDefault();
       $.ajax({
@@ -38,9 +35,9 @@
             var evtCount = data.success.length;
             var events = [];
             for (var i = 0; i < evtCount; i++) {
-
               events.push({
                 schedule_id: data.success[i].schedule_id,
+                course_id: data.success[i].course_id,
                 tutor_id: data.success[i].tutor_id,
                 start: data.success[i].date.slice(0,11) + data.success[i].start,
                 end: data.success[i].date.slice(0,11) + data.success[i].end
@@ -79,6 +76,7 @@
         defaultView: "agendaWeek",
         eventColor: 'green',
         events: evtArr,
+        eventTextColor: 'black',
         eventAfterRender: function(event, elt, view ) {
           var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
           if(elt.find(".fc-event-title").length === 0) {
@@ -94,6 +92,7 @@
            var end = event.end._i.slice(11, 19);
            var data = {
              'schedule_id': event.schedule_id,
+             'course_id': event.course_id,
              'tutor_id': event.tutor_id,
              'date': date,
              'start': start,
@@ -131,18 +130,20 @@
   });
 
 </script>
+<div class="container" id="info">
+  <h2><center>Find A Tutor</center></h2>
+</div>
 <form action="avaible_search"  method="POST" id="find_tutor">
-<form>
-  <div class="form-group row">
-    <div class="col-8">
-      <div class="input-group">
-        <input id="course_search" name="course_search" placeholder="CMPS 480" type="text" class="form-control">
-        <div class="input-group-append">
-          <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input id="course_search" name="course_search" placeholder="CMPS 480" type="text" class="form-control">
+          <span class="input-group-btn">
+            <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+          </span>
         </div>
       </div>
     </div>
-  </div>
 </form>
 
 <div id="calendar"></div>

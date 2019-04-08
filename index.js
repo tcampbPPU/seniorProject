@@ -111,15 +111,18 @@ var sha512 = function(password, salt){
 
 function getMenu(req) {
   var menu = [];
-  menu.push({"page": ".", "label": "Home"});
-
-  if (req.session.user_id) {
-    menu.push({"page": "schedule", "label": "Find Tutor"});
+  if (!req.session.user_id) {
+    menu.push({"page": ".", "label": "Login"});
   }
-  if (req.session.is_admin || req.session.is_tutor) {
-    menu.push({"page": "tutor_view", "label": "Appointments"}, {"page": "save_schedule", "label": "Create Schedule"});
+  else {
+    menu.pop();
+    if (req.session.user_id) {
+      menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
+    }
+    if (req.session.is_admin || req.session.is_tutor) {
+      menu.push({"page": "save_schedule", "label": "Create Schedule"});
+    }
   }
-
   return menu;
 };
 
@@ -157,6 +160,35 @@ app.get('/create_appointment', function(req, res) {
   });
 });
 
+
+app.get('/view_appointment', function(req, res) {
+  res.render('view_appointment', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name,
+    tutor: req.session.is_tutor
+  });
+});
+
+app.get('/modify_schedule', function(req, res) {
+  res.render('modify_schedule', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name,
+    tutor: req.session.is_tutor
+  });
+});
+
+app.get('/tutor_view', function(req, res) {
+  res.render('tutor_view', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name,
+    tutor: req.session.is_tutor
+  });
+});
+
+/*
 // Page that shows the appointments to a tutor
 app.get('/tutor_view', function(req, res) {
   if(req.session.is_tutor) {
@@ -167,11 +199,12 @@ app.get('/tutor_view', function(req, res) {
        login: req.session.user_id ? req.session.user_id : false,
        user_name: req.session.user_first_name,
      });
-       console.log(req.session.user_id);
   }else {
     res.redirect(303, ".");
   }
 });
+*/
+
 
 // Allows tutor to create schedule
 app.get('/save_schedule', function(req, res) {
@@ -316,11 +349,10 @@ app.post("/find_tutor", function(req, res) {
                     console.log(err);
                     res.send({success: false});
                   }else {
-                    if (appts_result.length != 0) {
-                      var result = buildOutput(schedule_result, appts_result);
-                      console.log(result);
-                      res.send({success: result});
-                    }
+                    // check if no return
+                    var result = buildOutput(schedule_result, appts_result);
+                    // console.log(result);
+                    res.send({success: result});
                   }
                 });
               }catch (err) {
@@ -338,11 +370,12 @@ app.post("/find_tutor", function(req, res) {
   });
 });
 
-/*
+
 function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
+  console.log(appt);
+  // Special Case if no appointments are found on a given day
   var data = [];
   appt = _.sortBy(appt, ['date', 'start']);
-  // console.log(appt);
   schedule = schedule[0];
   var last_end_time = schedule.start;
   var schedule_end_time = schedule.end;
@@ -350,22 +383,51 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
     if (schedule.date.valueOf() == appt[i].date.valueOf()) { // checking if dates match
       // TODO Set time intervals
       if (last_end_time != appt[i].start) {
-        data.push({
-          schedule_id: schedule.schedule_id,
-          tutor_id: schedule.tutor_id,
-          date: schedule.date,
-          start: last_end_time,
-          end: appt[i].start
-        });
+        var dateElements = formatDate(appt[i].date.toString().slice(0,16));
+        dateElements = dateElements.split("-");
+        var startElements = appt[i].start.split(":");
+        var endElements = appt[i].end.split(":");
+        var year = dateElements[0];
+        var month = Number(dateElements[1]) - 1;
+        var day = dateElements[2];
+        var start_hour = startElements[0];
+        var start_min = startElements[1];
+        var start_sec = startElements[2];
+        var end_hour = endElements[0];
+        var end_min = endElements[1];
+        var end_sec = endElements[2];
+        var start = new Date(year, month, day, start_hour, start_min, start_sec).getTime();
+        var end = new Date(year, month, day, end_hour, end_min, end_sec).getTime();
+        for (var j = 0; j < (end - start) / 1800000; j++) {
+          var tmpstart = start + j * 1800000;
+          var tmpend = start + (j + 1) * 1800000;
+          tmpstart = new Date(tmpstart);
+          tmpend = new Date(tmpend);
+          var avibleStart =  msToTime(tmpstart - 14400000);
+          var avibleEnd = msToTime(tmpend - 14400000);
+          if (last_end_time != avibleStart) {
+            data.push({
+              schedule_id: schedule.schedule_id,
+              tutor_id: schedule.tutor_id,
+              course_id: schedule.course_id,
+              date: schedule.date,
+              start: last_end_time,
+              end: avibleStart
+            });
+          }
+          last_end_time = avibleEnd; // ms
+        }
       }
     }else {
       console.log("Schedule date does not match with our appointments");
     }
     last_end_time = appt[i].end;
-  }if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
+  }
+  if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
     data.push({
       schedule_id: schedule.schedule_id,
       tutor_id: schedule.tutor_id,
+      course_id: schedule.course_id,
       date: schedule.date,
       start: last_end_time,
       end: schedule_end_time
@@ -373,10 +435,78 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
   }
   return data;
 }
-*/
 
 
 
+/*
+function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
+  var data = [];
+  if (appt.length > 0) {
+    console.log(schedule);
+    console.log("---------------");
+    console.log(appt);
+    appt = _.sortBy(appt, ['date', 'start']);
+    schedule = schedule[0];
+    var last_end_time = schedule.start;
+    var schedule_end_time = schedule.end;
+    for (var i = 0; i < appt.length; i++) {
+      var dateElements = formatDate(appt[i].date.toString().slice(0,16));
+      dateElements = dateElements.split("-");
+      var startElements = appt[i].start.split(":");
+      var endElements = appt[i].end.split(":");
+      var year = dateElements[0];
+      var month = Number(dateElements[1]) - 1;
+      // var month = dateElements[1];
+      var day = dateElements[2];
+      var start_hour = startElements[0];
+      var start_min = startElements[1];
+      var start_sec = startElements[2];
+      var end_hour = endElements[0];
+      var end_min = endElements[1];
+      var end_sec = endElements[2];
+      var start = new Date(year, month, day, start_hour, start_min, start_sec).getTime();
+      var end = new Date(year, month, day, end_hour, end_min, end_sec).getTime();
+      // console.log(start, end);
+      if (schedule.date.valueOf() == appt[i].date.valueOf()) { // checking if dates match
+        // TODO Set time intervals
+       for (var j = 0; j < (end - start) / 1800000; j++) {
+         var tmpstart = start + j * 1800000;
+         var tmpend = start + (j + 1) * 1800000;
+          if (last_end_time != appt[i].start) {
+            data.push({
+              schedule_id: schedule.schedule_id,
+              course_id: schedule.course_id,
+              tutor_id: appt[i].tutor_id,
+              date: appt[i].date,
+              start: msToTime(tmpstart),
+              end: msToTime(tmpend)
+            });
+          }
+          last_end_time = appt[i].end;
+        }
+      }else {
+        console.log("Schedule date does not match with our appointments");
+      }
+    }
+  }else {
+    // do thing to return the full day in 30 min increments
+    console.log("Full day as increments...");
+  }
+  // if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
+  //   data.push({
+  //     schedule_id: schedule.schedule_id,
+  //     tutor_id: schedule.tutor_id,
+  //     date: schedule.date,
+  //     start: last_end_time,
+  //     end: schedule_end_time
+  //   });
+  // }
+  return data;
+}
+
+
+
+// Not working way
 function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
   var data = [];
   appt = _.sortBy(appt, ['date', 'start']);
@@ -409,7 +539,8 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
        var tmpend = start + (j + 1) * 1800000;
         if (last_end_time != appt[i].start) {
           data.push({
-            schedule_id: appt[i].schedule_id,
+            schedule_id: schedule.schedule_id,
+            course_id: schedule.course_id,
             tutor_id: appt[i].tutor_id,
             date: appt[i].date,
             start: msToTime(tmpstart),
@@ -434,7 +565,7 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
   return data;
 }
 
-
+*/
 
 
 // Loads a tutors appointments on page load
@@ -445,7 +576,13 @@ app.post("/load_appointments", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var q = "select appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
+      if (req.session.is_tutor == 0) {
+        // query for student
+        var q = "select appointment.id as appointment_id,appointment.date, appointment.start_time, appointment.end_time, appointment.location, appointment.notes, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.tutor_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.student_id = ?";
+      }else {
+        // query for tutor
+        var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
+      }
       var values = [req.session.user_id];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -484,9 +621,9 @@ app.post("/confirm_appointments", function(req, res) {
       var date = req.body.date;
       var start = req.body.start;
       var end = req.body.end;
-      var q = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`) values (?,?,?,?,?,?,?,?,?)";
-      var values = [req.session.user_id, tutor_id, date, start, end, '0', 'Math Center', '0', course_id];
-      // var values = ['9', tutor_id, date, start, end, '0', 'Math Center', '0', course_id];
+      var notes = req.body.notes;
+      var q = "insert into appointment (`student_id`, `tutor_id`, `date`, `start_time`, `end_time`, `is_completed`, `location`, `is_walkin`, `course_id`, `notes`) values (?,?,?,?,?,?,?,?,?,?)";
+      var values = [req.session.user_id, tutor_id, date, start, end, '0', 'Math Center', '0', course_id, notes];
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
@@ -498,12 +635,67 @@ app.post("/confirm_appointments", function(req, res) {
           }
         });
       }catch (err) {
-        console.log(err, "Error while trying to save appointment -> app.post.confirm_appointments");
+        console.log(err, "Error app.post.confirm_appointments");
       }
     }
-
   });
 });
+
+// TODO: To handle the notes created on confirm_appointments
+
+
+app.post("/view_appts_more_detail", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var q = "select appointment.id, appointment.date, appointment.start_time, appointment.end_time, appointment.notes, appointment.tutor_notes, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join course on appointment.course_id = course.id where appointment.id = ?";
+      var values = [req.body.appointment_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            res.send({success: result});
+          }
+        });
+      }catch (err) {
+        console.log(err, "Error app.post.view_appts_more_detail");
+      }
+    }
+  });
+});
+
+
+
+app.post("/update_tutor_note", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var q = "UPDATE appointment SET tutor_notes = ? WHERE id = ?";
+      var values = [req.body.note, req.body.id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            res.send({success: true});
+          }
+        });
+      }catch (err) {
+        console.log(err, "Error app.post.view_appts_more_detail");
+      }
+    }
+  });
+});
+
 
 // Handles loading the tutors schedule calendar
 app.post("/load_schedule", function(req, res) {
@@ -514,22 +706,16 @@ app.post("/load_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "select * from schedule where tutor_id = ?";
-      var values = [req.session.user_id]; // q += and where user.id = ? // and appointment.date >= now()
+      var values = [req.body.user_id];
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            res.send({success:false});
+            res.send({success: false});
           }else {
-            if (result.length != 0) {
-              res.send({success:result});
-            }
-            else {
-              res.send({success:false});
-            }
+            res.send({success: result});
           }
         });
-
       } catch (err) {
         console.log(err, " Error in load_schedule.post function");
       }
@@ -574,15 +760,23 @@ app.post("/save_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "insert into schedule (schedule.tutor_id, schedule.date, schedule.start, schedule.end) values (?, ?, ?, ?)";
-      var values = [req.session.user_id, req.body.date, req.body.start, req.body.end];
+      var tutor_id = req.session.user_id;
+      var course = req.body.course;
+      var dateElements = req.body.start_time.slice(0,10).split("/");
+      var date = dateElements[2]+ '-' +dateElements[0]+ '-' +dateElements[1];
+      var start_time = ConvertTimeformat(req.body.start_time.slice(11,19)) + ":00";
+      var end_time = ConvertTimeformat(req.body.end_time.slice(11,19)) + ":00";
+      var values = [tutor_id, date, start_time, end_time];
+      console.log(values);
       try {
-        con.query(q, [values], function (err, result, fields) {
+        con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            // res.send({success: false});
+            res.send({success: false});
           }else {
-            // result
             console.log(result);
+            res.send({success: true});
+          // TODO: Need to insert course in to the tutor_has_course table
           }
         });
       }catch (err) {
@@ -633,3 +827,17 @@ function msToTime(duration) {
 
   return hours + ":" + minutes + ":" + seconds;
 }
+
+  function ConvertTimeformat(time) {
+  var format = "24";
+  var hours = Number(time.match(/^(\d+)/)[1]);
+  var minutes = Number(time.match(/:(\d+)/)[1]);
+  var AMPM = time.match(/\s(.*)$/)[1];
+  if (AMPM == "PM" && hours < 12) hours = hours + 12;
+  if (AMPM == "AM" && hours == 12) hours = hours - 12;
+  var sHours = hours.toString();
+  var sMinutes = minutes.toString();
+  if (hours < 10) sHours = "0" + sHours;
+  if (minutes < 10) sMinutes = "0" + sMinutes;
+    return sHours + ":" + sMinutes;
+  }

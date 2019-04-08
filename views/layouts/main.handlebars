@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>PPU Tutor Website</title>
     <script src="jquery.js"></script>
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-      <link rel="stylesheet" href="fullcalendar.min.css" />
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <link rel="stylesheet" href="fullcalendar.min.css"/>
+      <link rel="stylesheet" href="bootstrap-datetimepicker.min.css"/>
       <script src="moment.js" charset="utf-8"></script>
       <script src="fullcalendar.min.js"></script>
+      <script src="bootstrap-datetimepicker.min.js"></script>
       <style media="screen">
         body {
           background-color: white;
@@ -27,36 +29,41 @@
       </style>
   </head>
   <body>
-    <!--Navgation Bar, only shown to tutors and admin. Admin should have features shown tutor does not have access to.-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          {{# each menu}}
-          <li class="nav-item">
-            <a class="nav-link" href={{page}}>{{label}}</a>
-          </li>
-          {{/each}}
-        </ul>
-      </div>
-      {{#if login}}
-      <span class="nav-item " style="float:right;" >
-        <table>
-          <tr style="background-color:inherit;">
-            <td></td><td>{{user_name}}</td><td> <a class="nav-link " href="logout" style="color:grey;">Logout</a></td>
-          </tr>
-        </table>
-     </span>
-     {{/if}}
-    </nav>
+    <div class="container">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              {{# each menu}}
+                <li class="nav-item">
+                  <a href={{page}}>{{label}}</a>
+                </li>
+              {{/each}}
+            </ul>
+            {{#if login}}
+            <ul class="nav navbar-nav navbar-right">
+              <li><a>{{user_name}}</a></li>
+              <li><a href="logout">Logout</a></li>
+            </ul>
+            {{/if}}
+          </div>
+        </div>
+      </nav>
+    </div>
     {{{body}}}
     <footer class="footer">
      <div class="container">
        <center><span class="text-muted">Developed by Point Park IT students.</span></center>
      </div>
    </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   </body>

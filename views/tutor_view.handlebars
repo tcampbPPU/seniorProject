@@ -19,30 +19,39 @@
        */
   }
 
+  /* .fc-event{
+    width: 100px !important;
+  } */
+
 </style>
-{{#if admin }}
-{{#if tutor }}
+{{#if login}}
 <script type="text/javascript">
-  // loads a calendar of appointments for a tutor
-  $(document).ready(function() {
-  // tutor can only view thier appointments & Admin can view all
+  $(function() {
+
+    // User id data
+    var data = {
+      user_id : {{login}}
+    }
+    var events1 = [];
+    var events2 = [];
+    // Load Appointments ...
     $.ajax({
       type: 'post',
       url:'load_appointments',
-      context: document.body,
+      data: data,
       success: function(data) {
         if (data.success) {
           var evtCount = data.success.length;
-          var events = [];
           for (var i = 0; i < evtCount; i++) {
-            events.push({
+            events1.push({
+              appointment_id: data.success[i].appointment_id,
               title: data.success[i].first_name + " " + data.success[i].last_name,
               start: data.success[i].date.slice(0,11) + data.success[i].start_time,
               end: data.success[i].date.slice(0,11) + data.success[i].end_time,
               description: data.success[i].course_code
             });
           }
-          loadCal(events);
+          loadEvents(events1, events2);
         }else{
           console.log("no data returned");
         }
@@ -52,8 +61,32 @@
       }
     });
 
-    function loadCal(evtArr) {
-      console.log(evtArr);
+    // Load tutors schedule, only if tutor is logged in
+    $.ajax({
+      type: 'post',
+      url:'load_schedule',
+      data: data,
+      success: function(response) {
+        if (response.success) {
+          var schedEvtCount = response.success.length;
+          for (var i = 0; i < schedEvtCount; i++) {
+            events2.push({
+              schedule_id: response.success[i].id,
+              start: response.success[i].date.slice(0,11) + response.success[i].start,
+              end: response.success[i].date.slice(0,11) + response.success[i].end
+            });
+          }
+          // loadEvents(events1, events2);
+        }else{
+          console.log("no data returned");
+        }
+      },
+      error: function() {
+        console.log("Error");
+      }
+    });
+
+    function loadEvents(evtArr1, evtArr2) {
       $('#calendar').fullCalendar({
         header: {
           left: 'prev,next today',
@@ -71,7 +104,12 @@
         slotDuration: '00:15:00',
         defaultView: "agendaWeek",
         eventColor: 'green',
-        events: evtArr,
+        // events: evtArr,
+        eventSources: [
+          evtArr1,
+          evtArr2
+        ],
+        eventTextColor: 'black',
         eventAfterRender: function(event, elt, view ) {
           var formattedTime = moment(event.start, event.end, 'HH:mm').format('HH:mm');
           if(elt.find(".fc-event-title").length === 0) {
@@ -80,16 +118,37 @@
             elt.find(".fc-event-time").text(formattedTime);
           }
           elt.find('.fc-title').after("<span>"+ event.description +"</span>");
+        },
+        eventClick: function(event) {
+          var data = {
+            'id': event.appointment_id ? event.appointment_id : event.schedule_id
+          };
+          var querystring = encodeQueryData(data);
+          if (event.appointment_id) {
+            location.assign("view_appointment?" + querystring);
+          }else {
+            location.assign("modify_schedule?" + querystring);
+            // TODO: add page and ajax for modify_schedule
+          }
         }
       });
+    }
+
+    function encodeQueryData(data) {
+      var ret = [];
+      for (let d in data)
+      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+      return ret.join('&');
     }
   });
 
 
 </script>
+<div class="container" id="info">
+  <h2><center>List of Appointments</center></h2>
+</div>
 <div id="calendar"></div>
 
 {{else}}
 <h1 align="center">You need to login to view this page.</h1>
-{{/ if}}
-{{/ if}}
+{{/if}}
