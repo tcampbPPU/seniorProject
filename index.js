@@ -20,6 +20,7 @@ app.set("view engine", "handlebars");
 app.set('port', process.env.PORT || credentials.port || 3000);
 
 
+
 // Authentication
 app.use(function(req, res, next) {
   if (!credentials.authentication || req.get("X-Authentication-Key") === credentials.authentication.key) {
@@ -170,14 +171,6 @@ app.get('/view_appointment', function(req, res) {
   });
 });
 
-app.get('/modify_schedule', function(req, res) {
-  res.render('modify_schedule', {
-    menu: getMenu(req),
-    login: req.session.user_id ? req.session.user_id : false,
-    user_name: req.session.user_first_name,
-    tutor: req.session.is_tutor
-  });
-});
 
 app.get('/tutor_view', function(req, res) {
   res.render('tutor_view', {
@@ -324,7 +317,13 @@ app.post("/find_tutor", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var course = req.body.course_search;
+      // add front end changes
+      var courseName = req.body.course_name + " ";
+
+      var courseCode = req.body.course_code;
+      // CMPS 480 = target
+      var course = courseName.concat(courseCode);
+      console.log(course);
       var query = "select schedule.id as schedule_id, schedule.tutor_id, schedule.date as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start limit 1";
       var value = [course];
       try {
@@ -349,10 +348,11 @@ app.post("/find_tutor", function(req, res) {
                     console.log(err);
                     res.send({success: false});
                   }else {
-                    // check if no return
-                    var result = buildOutput(schedule_result, appts_result);
-                    // console.log(result);
-                    res.send({success: result});
+                    if (appts_result.length != 0) {
+                      var result = buildOutput(schedule_result, appts_result);
+                      console.log(result);
+                      res.send({success: result});
+                    }
                   }
                 });
               }catch (err) {
@@ -370,12 +370,11 @@ app.post("/find_tutor", function(req, res) {
   });
 });
 
-
+/*
 function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
-  console.log(appt);
-  // Special Case if no appointments are found on a given day
   var data = [];
   appt = _.sortBy(appt, ['date', 'start']);
+  // console.log(appt);
   schedule = schedule[0];
   var last_end_time = schedule.start;
   var schedule_end_time = schedule.end;
@@ -383,51 +382,22 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
     if (schedule.date.valueOf() == appt[i].date.valueOf()) { // checking if dates match
       // TODO Set time intervals
       if (last_end_time != appt[i].start) {
-        var dateElements = formatDate(appt[i].date.toString().slice(0,16));
-        dateElements = dateElements.split("-");
-        var startElements = appt[i].start.split(":");
-        var endElements = appt[i].end.split(":");
-        var year = dateElements[0];
-        var month = Number(dateElements[1]) - 1;
-        var day = dateElements[2];
-        var start_hour = startElements[0];
-        var start_min = startElements[1];
-        var start_sec = startElements[2];
-        var end_hour = endElements[0];
-        var end_min = endElements[1];
-        var end_sec = endElements[2];
-        var start = new Date(year, month, day, start_hour, start_min, start_sec).getTime();
-        var end = new Date(year, month, day, end_hour, end_min, end_sec).getTime();
-        for (var j = 0; j < (end - start) / 1800000; j++) {
-          var tmpstart = start + j * 1800000;
-          var tmpend = start + (j + 1) * 1800000;
-          tmpstart = new Date(tmpstart);
-          tmpend = new Date(tmpend);
-          var avibleStart =  msToTime(tmpstart - 14400000);
-          var avibleEnd = msToTime(tmpend - 14400000);
-          if (last_end_time != avibleStart) {
-            data.push({
-              schedule_id: schedule.schedule_id,
-              tutor_id: schedule.tutor_id,
-              course_id: schedule.course_id,
-              date: schedule.date,
-              start: last_end_time,
-              end: avibleStart
-            });
-          }
-          last_end_time = avibleEnd; // ms
-        }
+        data.push({
+          schedule_id: schedule.schedule_id,
+          tutor_id: schedule.tutor_id,
+          date: schedule.date,
+          start: last_end_time,
+          end: appt[i].start
+        });
       }
     }else {
       console.log("Schedule date does not match with our appointments");
     }
     last_end_time = appt[i].end;
-  }
-  if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
+  }if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
     data.push({
       schedule_id: schedule.schedule_id,
       tutor_id: schedule.tutor_id,
-      course_id: schedule.course_id,
       date: schedule.date,
       start: last_end_time,
       end: schedule_end_time
@@ -435,78 +405,10 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
   }
   return data;
 }
+*/
 
 
 
-/*
-function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
-  var data = [];
-  if (appt.length > 0) {
-    console.log(schedule);
-    console.log("---------------");
-    console.log(appt);
-    appt = _.sortBy(appt, ['date', 'start']);
-    schedule = schedule[0];
-    var last_end_time = schedule.start;
-    var schedule_end_time = schedule.end;
-    for (var i = 0; i < appt.length; i++) {
-      var dateElements = formatDate(appt[i].date.toString().slice(0,16));
-      dateElements = dateElements.split("-");
-      var startElements = appt[i].start.split(":");
-      var endElements = appt[i].end.split(":");
-      var year = dateElements[0];
-      var month = Number(dateElements[1]) - 1;
-      // var month = dateElements[1];
-      var day = dateElements[2];
-      var start_hour = startElements[0];
-      var start_min = startElements[1];
-      var start_sec = startElements[2];
-      var end_hour = endElements[0];
-      var end_min = endElements[1];
-      var end_sec = endElements[2];
-      var start = new Date(year, month, day, start_hour, start_min, start_sec).getTime();
-      var end = new Date(year, month, day, end_hour, end_min, end_sec).getTime();
-      // console.log(start, end);
-      if (schedule.date.valueOf() == appt[i].date.valueOf()) { // checking if dates match
-        // TODO Set time intervals
-       for (var j = 0; j < (end - start) / 1800000; j++) {
-         var tmpstart = start + j * 1800000;
-         var tmpend = start + (j + 1) * 1800000;
-          if (last_end_time != appt[i].start) {
-            data.push({
-              schedule_id: schedule.schedule_id,
-              course_id: schedule.course_id,
-              tutor_id: appt[i].tutor_id,
-              date: appt[i].date,
-              start: msToTime(tmpstart),
-              end: msToTime(tmpend)
-            });
-          }
-          last_end_time = appt[i].end;
-        }
-      }else {
-        console.log("Schedule date does not match with our appointments");
-      }
-    }
-  }else {
-    // do thing to return the full day in 30 min increments
-    console.log("Full day as increments...");
-  }
-  // if (last_end_time != schedule_end_time) { // this gets the time from the last Appointment to the end of the schedule
-  //   data.push({
-  //     schedule_id: schedule.schedule_id,
-  //     tutor_id: schedule.tutor_id,
-  //     date: schedule.date,
-  //     start: last_end_time,
-  //     end: schedule_end_time
-  //   });
-  // }
-  return data;
-}
-
-
-
-// Not working way
 function buildOutput(schedule, appt) { // passing in our schedule_result & appts_result
   var data = [];
   appt = _.sortBy(appt, ['date', 'start']);
@@ -565,7 +467,7 @@ function buildOutput(schedule, appt) { // passing in our schedule_result & appts
   return data;
 }
 
-*/
+
 
 
 // Loads a tutors appointments on page load
@@ -686,6 +588,7 @@ app.post("/update_tutor_note", function(req, res) {
             console.log(err);
             res.send({success: false});
           }else {
+            console.log(result);
             res.send({success: true});
           }
         });
@@ -706,16 +609,22 @@ app.post("/load_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "select * from schedule where tutor_id = ?";
-      var values = [req.body.user_id];
+      var values = [req.session.user_id]; // q += and where user.id = ? // and appointment.date >= now()
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            res.send({success: false});
+            res.send({success:false});
           }else {
-            res.send({success: result});
+            if (result.length != 0) {
+              res.send({success: result});
+            }
+            else {
+              res.send({success: false});
+            }
           }
         });
+
       } catch (err) {
         console.log(err, " Error in load_schedule.post function");
       }
@@ -776,7 +685,6 @@ app.post("/save_schedule", function(req, res) {
           }else {
             console.log(result);
             res.send({success: true});
-          // TODO: Need to insert course in to the tutor_has_course table
           }
         });
       }catch (err) {
