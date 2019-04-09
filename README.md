@@ -8,22 +8,16 @@ This application will allow students to connect with a tutor who is specialized 
 
 ## Usage
 ### Student
-* Sign in / out of Tutoring center
-* Find Tutor in specialized in selected course
-* If tutor was found allow for student to request a 1 on 1 meeting with the tutor
+* Connect with a Tutor specialized in selected course for 1 on 1 appointment
+* Option to leave appointment note for tutor to read
+* Can view calendar view of appointments
+* Cron will run to notify students of upcoming eligible to tutor
+* Students can cancel appointments
 ### Tutor
-* Create schedule of hours of availability
-* Select courses tutor is eligible to tutor
-* Select visit reason specialties [General Help, Homework Help, Test Prep, Writing Help]
-* Log a student visit in
-* View log of students they have previously tutored.
-* View log of student that are currently log in receiving tutor assistance
+* Create schedule of hours of availability & enter courses eligible to tutor & (Can Modify given a specific date)
+* View appointments and can create notes based on a appointment
 
 ### Admin
-* Edit all preferences of all tutors
-* View log of all students who visited the tutoring center
-* Give permissions
-* View list of students that are athletes and/or get disability services
 * More to come...
 
 
