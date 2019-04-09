@@ -20,6 +20,7 @@ app.set("view engine", "handlebars");
 app.set('port', process.env.PORT || credentials.port || 3000);
 
 
+
 // Authentication
 app.use(function(req, res, next) {
   if (!credentials.authentication || req.get("X-Authentication-Key") === credentials.authentication.key) {
@@ -179,7 +180,6 @@ app.get('/view_appointment', function(req, res) {
   });
 });
 
-
 app.get('/modify_schedule', function(req, res) {
   if(req.session.is_tutor) {
     res.render('modify_schedule', {
@@ -193,6 +193,7 @@ app.get('/modify_schedule', function(req, res) {
     res.redirect(303, ".");
   }
 });
+
 
 
 
@@ -291,8 +292,15 @@ app.post("/find_tutor", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var course = req.body.course_search;
-      var query = "select schedule.id as schedule_id, schedule.tutor_id, CAST(schedule.date AS char) as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start limit 1";
+
+      // add front end changes
+      var courseName = req.body.course_name + " ";
+
+      var courseCode = req.body.course_code;
+      // CMPS 480 = target
+      var course = courseName.concat(courseCode);
+      console.log(course);
+      var query = "select schedule.id as schedule_id, schedule.tutor_id, schedule.date as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start limit 1";
       var value = [course];
       try {
         con.query(query, value, function (err, schedule_result, fields) {
@@ -369,6 +377,8 @@ function buildOutput(schedule, appt) {
     var apptDate = appt[i].date.slice(0, 11);
 
 
+
+
     // each appointment start time in MS
      var apptStartTimeMS = new Date(apptDate +"T"+ appt[i].start).getTime();
 
@@ -411,6 +421,7 @@ function buildOutput(schedule, appt) {
       start: msToTime(intervalStart),
       end: msToTime(intervalEnd)
     });
+
 
   }
   // print output
@@ -536,6 +547,7 @@ app.post("/update_tutor_note", function(req, res) {
             console.log(err);
             res.send({success: false});
           }else {
+            console.log(result);
             res.send({success: true});
           }
         });
@@ -556,16 +568,22 @@ app.post("/load_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "select * from schedule where tutor_id = ?";
-      var values = [req.body.user_id];
+      var values = [req.session.user_id]; // q += and where user.id = ? // and appointment.date >= now()
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            res.send({success: false});
+            res.send({success:false});
           }else {
-            res.send({success: result});
+            if (result.length != 0) {
+              res.send({success: result});
+            }
+            else {
+              res.send({success: false});
+            }
           }
         });
+
       } catch (err) {
         console.log(err, " Error in load_schedule.post function");
       }
@@ -658,7 +676,6 @@ app.post("/save_schedule", function(req, res) {
           }else {
             console.log(result);
             res.send({success: true});
-          // TODO: Need to insert course in to the tutor_has_course table
           }
         });
       }catch (err) {
