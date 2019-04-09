@@ -1,22 +1,36 @@
 <style media="screen">
-  .btn-primary {
+  /* .btn-primary {
     width: 30%;
     margin-left: 350pt;
+  } */
+
+  .form-group {
+    text-align: center;
+  }
+
+  input {
+    max-width: 20em;
+    margin: auto;
+    display: block;
+    text-align: center;
   }
 
 </style>
 {{#if tutor}}
   <script type="text/javascript">
     $(function () {
-      // setTimeout(function(){
        $('#start').datetimepicker();
        $('#end').datetimepicker();
        $('#submitBtn').on('click', function() {
          var data = {
            course: $('#course').val(),
-           start_time: $("#start").find("input").val(),
-           end_time: $("#end").find("input").val()
+           date: $('#date').val(),
+           start: $('#start_time').val() + ":00",
+           end: $('#end_time').val() + ":00"
+           // start_time: $("#start").find("input").val(),
+           // end_time: $("#end").find("input").val()
          };
+
          $.ajax({
            type: 'post',
            url:'save_schedule',
@@ -30,16 +44,54 @@
              }
 
            },
-           error: function() {
-            console.log("Error");
+           error: function(jqXHR, textStatus, errorThrown) {
+             console.log(textStatus, errorThrown);
            }
          });
        });
-
-       // },1000)
      });
   </script>
   <div class="container">
+    <h2><center>Select Courses & Set Schedule</center></h2>
+
+    <!-- Would like to add dropdown option like in find tutor -->
+    <div class="form-group">
+     <label class="control-label " for="course">Course: </label>
+      <input class="form-control" id="course" name="course" type="text" placeholder="CMPS 480"/>
+    </div>
+
+    <!--  Date-->
+    <div class="form-group">
+     <label class="control-label " for="date">Date: </label>
+      <input class="form-control" id="date" name="date" type="date" placeholder="YYYY-MM-DD"/>
+      <span class="note">Format: YYYY-MM-DD</span>
+    </div>
+
+    <!--  start time -->
+    <div class="form-group">
+     <label class="control-label " for="start_time">Start: </label>
+      <input class="form-control" id="start_time" name="start_time" type="time"/>
+      <span class="note">Format: HH:MM</span>
+    </div>
+    <!--  end time -->
+    <div class="form-group ">
+     <label class="control-label " for="end_time">End: </label>
+      <input class="form-control" id="end_time" name="end_time" type="time"/>
+      <span class="note">Format: HH:MM</span>
+    </div>
+
+    <!-- btn -->
+    <div class="form-group">
+     <div>
+      <button id="submitBtn" class="btn btn-primary " name="submit" type="submit">Submit</button>
+     </div>
+    </div>
+
+
+  </div>
+
+
+  <!-- <div class="container">
      <div class="panel panel-primary">
         <div class="panel-heading">Set Schedule and Select Courses</div>
         <div class="panel-body">
@@ -79,7 +131,7 @@
            <input id="submitBtn" type="submit" class="btn btn-primary" value="Submit">
         </div>
      </div>
-  </div>
+  </div> -->
 {{else}}
   <h1 align="center">You need to login to view this page.</h1>
 {{/if}}
