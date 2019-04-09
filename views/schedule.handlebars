@@ -21,7 +21,6 @@
   // Shows a list of tutors and avaiblity given a course code input.
   // Still working on not showing the already scheduled appointments
   $(function() {
-    console.log({{login}});
     $('#find_tutor').on('submit', function(e) {
       e.preventDefault();
       $.ajax({
@@ -30,6 +29,7 @@
         data: $(this).serialize(),
         success: function(data) {
           if (data.success != false) {
+            console.log(data.success);
             $("calendar").show();
             // prepareIntervals
             var evtCount = data.success.length;
@@ -39,8 +39,8 @@
                 schedule_id: data.success[i].schedule_id,
                 course_id: data.success[i].course_id,
                 tutor_id: data.success[i].tutor_id,
-                start: data.success[i].date.slice(0,11) + data.success[i].start,
-                end: data.success[i].date.slice(0,11) + data.success[i].end
+                start: data.success[i].date.slice(0,11) +"T"+ data.success[i].start,
+                end: data.success[i].date.slice(0,11) +"T"+ data.success[i].end
               });
             }
             console.log(events);

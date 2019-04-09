@@ -1,7 +1,39 @@
 <style media="screen">
+
+  .appt_item {
+    max-width: 35em;
+    margin: auto;
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 22px;
+    font-weight: normal;
+  }
+
+  textarea {
+    width: 90%;
+    height: 150px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    resize: none;
+  }
   button {
-    margin-left: 50pt;
-    margin-top: 50pt;
+    margin: auto;
+    display: block;
+    background-color: #4286f4;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 6px;
   }
 
 </style>
@@ -9,11 +41,6 @@
 <script type="text/javascript">
   // Confirmation Page to create an appointment with tutor
   $(function() {
-
-
-
-
-
     var urlParams = new URLSearchParams(window.location.search);
     var data = {
       appointment_id: urlParams.get('id')
@@ -54,8 +81,32 @@
                 console.log(resp);
                 location.assign("tutor_view");
               },
-              error: function() {
-                console.log("Error");
+              error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+              }
+            });
+          });
+        }
+        else {
+          // Allow student to have a option to cancel appointment
+          var button = $("<br/>" + "<button>");
+          $("#info").append(button);
+          button.html('Cancel Appointment');
+          $("button").on('click', function(e) {
+            var appt_id = {
+              id: urlParams.get('id')
+            }
+
+            $.ajax({
+              type: 'post',
+              url: 'cancel_appointment',
+              data: appt_id,
+              success: function(resp) {
+                alert("Are you sure you want to Cancel the Appointment?")
+                location.assign("tutor_view");
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
               }
             });
           });
@@ -65,23 +116,19 @@
         console.log("Error");
       }
     });
-
   });
 
 </script>
-
 <div class="container" id="info">
-  <h3>Appointment info</h3>
-  <span>Date:  <p id="date" style="display:inline;"></p></span> <br>
-  <span>Time In:  <p id="start_time" style="display:inline;"></p></span> <br>
-  <span>Time Out:  <p id="end_time" style="display:inline;"></p></span> <br>
-  <span>Student Notes:  <p id="notes" style="display:inline;"></p></span> <br>
-  <span>First Name:  <p id="first_name" style="display:inline;"></p></span> <br>
-  <span>Last Name:  <p id="last_name" style="display:inline;"></p></span> <br>
-  <span>Course Code:  <p id="course_code" style="display:inline;"></p></span> <br>
-  <span>Course Name:  <p id="course_name" style="display:inline;"></p></span> <br>
-  <!-- <label for="appts_notes" class="appts_notes">Appointment Notes: </label>
-  <textarea rows="20" cols="150" class="appts_notes" name="appts_notes"></textarea> -->
+  <h2><center>Appointment Info</center></h2>
+  <span class="appt_item">Date:  <p id="date" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Time In:  <p id="start_time" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Time Out:  <p id="end_time" style="display:inline;"></p></span> <br>
+  <span class="appt_item">First Name:  <p id="first_name" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Last Name:  <p id="last_name" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Course Code:  <p id="course_code" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Course Name:  <p id="course_name" style="display:inline;"></p></span> <br>
+  <span class="appt_item">Student Notes:  <p id="notes" style="display:inline;"></p></span> <br>
 </div>
 
 {{else}}
