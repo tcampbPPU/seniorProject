@@ -1,4 +1,5 @@
 <style>
+<<<<<<< HEAD
 /* .bootstrap-iso .formden_header h2, .bootstrap-iso .formden_header p, .bootstrap-iso form {
   font-family: Arial, Helvetica, sans-serif;
   color: green
@@ -34,7 +35,18 @@ input {
   display: block;
   text-align: center;
 }
+=======
+  .form-group {
+    text-align: center;
+  }
+>>>>>>> b6f1aa49f02de28a860afa01e065ff233abd6c9e
 
+  input {
+    max-width: 20em;
+    margin: auto;
+    display: block;
+    text-align: center;
+  }
 
 </style>
 <script type="text/javascript">
@@ -47,11 +59,9 @@ input {
         data: {
           user: $('#user').val(),
           pwd: $('#pwd').val(),
-          //$(this).serialize(),
         },
         success: function(response) {
           if (response.success == true) {
-            console.log(response.success);
             location.assign("schedule");
           }else{
             alert("Incorrect Password!");
@@ -65,6 +75,7 @@ input {
   });
 
 </script>
+<<<<<<< HEAD
 <!-- <div class="bootstrap-iso">
  <div class="container-fluid">
    <h3>Welcome!</h3>
@@ -95,6 +106,8 @@ input {
   </div>
  </div>
 </div> -->
+=======
+>>>>>>> b6f1aa49f02de28a860afa01e065ff233abd6c9e
 <div class="container">
   <form action="login"  method="POST" id="login">
     <h2><center>Welcome!</center></h2>
