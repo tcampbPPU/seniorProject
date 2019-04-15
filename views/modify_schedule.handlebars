@@ -46,13 +46,13 @@
         }
       });
 
-      // handles updating times
       $("#update_time").on('click', function() {
         var updatedTime = {
           id: urlParams.get('id'),
           start_time: $('#start_time').val(),
           end_time: $('#end_time').val(),
         }
+        console.log(updatedTime);
         $.ajax({
           type: 'post',
           url: 'update_schedule',
@@ -65,8 +65,6 @@
           }
         });
       });
-      //
-      // Handle change
     });
 
   </script>
@@ -78,14 +76,14 @@
     <!--  start time edit-->
     <div class="form-group">
      <label class="control-label " for="start_time">Start: </label>
-      <input class="form-control" id="start_time" name="start_time" type="text"/>
-      <span class="note">Format: HH:MM:SS</span>
+      <input class="form-control" id="start_time" name="start_time" type="time"/>
+      <span class="note">Format: HH:MM</span>
     </div>
     <!--  end time edit-->
     <div class="form-group ">
      <label class="control-label " for="end_time">End: </label>
-      <input class="form-control" id="end_time" name="end_time" type="text"/>
-      <span class="note">Format: HH:MM:SS</span>
+      <input class="form-control" id="end_time" name="end_time" type="time"/>
+      <span class="note">Format: HH:MM</span>
     </div>
 
     <div class="form-group">

@@ -1,9 +1,11 @@
 <style media="screen">
+
   .input-group {
     margin-left: 85%;
     width: 250px;
     padding: 10px;
   }
+
   #calendar {
       max-width: 900px;
       margin: 0 auto;
@@ -12,39 +14,19 @@
       margin-top: 20pt; */
   }
 
-  .course {
-    margin-left: 100%;
-    margin-top: 5pt;
-    width: 180px;
-  }
-  .codes {
-    margin-left: 50%;
-    width: 65px;
-  }
+
 </style>
 {{#if login}}
-
-
-
-
 <script type="text/javascript">
   // Shows a list of tutors and avaiblity given a course code input.
   // Still working on not showing the already scheduled appointments
-
-
   $(function() {
     $('#find_tutor').on('submit', function(e) {
       e.preventDefault();
-      var data = {
-        course_name: $('.course').val(),
-        course_code: $('.codes').val(),
-      };
-      // req.body.
-      console.log(data);
       $.ajax({
         type: 'post',
         url:'find_tutor',
-        data: data,//$(this).serialize(),
+        data: $(this).serialize(),
         success: function(data) {
           if (data.success != false) {
             console.log(data.success);
@@ -64,17 +46,18 @@
             console.log(events);
             loadCal(events);
           }else{
-            console.log("no data returned");
+            alert("No Tutors where found...");
             $("calendar").remove();
           }
         },
-        error: function() {
-          console.log("Error");
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
         }
       });
       // Should stop ajax from firing twice
       return false;
     });
+
     function loadCal(evtArr) {
       $('#calendar').fullCalendar({
         header: {
@@ -86,7 +69,7 @@
         editable: false,
         selectable: false,
         selectHelper: false,
-        weekends: false,
+        weekends: true,
         height: 800,
         minTime: "07:00:00",
         maxTime: "21:00:00",
@@ -124,12 +107,15 @@
         }
       });
     }
+
+
     function encodeQueryData(data) {
       var ret = [];
       for (let d in data)
       ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
       return "&" + ret.join('&');
     }
+
     function formatDate(date) {
       var d = new Date(date);
       var month = '' + (d.getMonth() + 1);
@@ -139,72 +125,26 @@
       if (day.length < 2) day = '0' + day;
       return [year, month, day].join('-');
     }
-    //
-    var series = [
-    {name: 'CMPS', code: '161'},
-    {name: 'CMPS', code: '163'},
-    {name: 'CMPS', code: '480'},
-    {name: 'MATH', code: '150'},
-    {name: 'MATH', code: '180'}
-    ]
 
-    $(".course").change(function(){
-    var courseName = $(this).val();
-    var options;
-    $(series).each(function(index, value){
-      if(value.name == courseName){
-        options += '<option value="'+value.code+'">'+value.code+'</option>';
-      }
-    });
 
-    $('.codes').html(options);
-    });
   });
-</script>
 
+</script>
 <div class="container" id="info">
   <h2><center>Find A Tutor</center></h2>
 </div>
 <form action="avaible_search"  method="POST" id="find_tutor">
-
-        <div class="col-md-4" >
-         <select class="course">
-          <option value=''><strong>Select Course</strong></option>
-          <option value="CMPS">CMPS</option>
-          <option value="MATH">MATH</option>
-    </select>
-</div>
-<div class="col-md-4" >
-    <select class="codes">
-    </select>
-
-    <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="input-group">
+          <input id="course_search" name="course_search" placeholder="CMPS 480" type="text" class="form-control">
+          <span class="input-group-btn">
+            <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+          </span>
+        </div>
+      </div>
     </div>
 </form>
-
-<script type="text/javascript">
-// var series = [
-// {name: 'CMPS', code: '161'},
-// {name: 'CMPS', code: '163'},
-// {name: 'CMPS', code: '480'},
-// {name: 'MATH', code: '150'},
-// {name: 'MATH', code: '180'}
-// ]
-//
-// $(".course").change(function(){
-// var courseName = $(this).val();
-// var options;
-// $(series).each(function(index, value){
-//   if(value.name == courseName){
-//     options += '<option value="'+value.code+'">'+value.code+'</option>';
-//   }
-// });
-//
-// $('.codes').html(options);
-// });
-
-</script>
-
 
 <div id="calendar"></div>
 

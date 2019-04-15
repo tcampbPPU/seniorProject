@@ -24,7 +24,7 @@
     background-color: #f8f8f8;
     resize: none;
   }
-  button {
+  #save_note {
     margin: auto;
     display: block;
     background-color: #4286f4;
@@ -33,6 +33,30 @@
     padding: 15px 32px;
     text-align: center;
     font-size: 13px;
+    border-radius: 6px;
+  }
+
+  #cancel_appointment {
+    margin: auto;
+    display: block;
+    background-color: #af0a0a;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+
+  #show_all {
+    margin: auto;
+    display: block;
+    background-color: #af0a0a;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    font-size: 11px;
     border-radius: 6px;
   }
 
@@ -64,10 +88,16 @@
           $("#info").append($('<textarea style="padding-left:0px" />'));
           $('textarea').text(data.success[0].tutor_notes);
           var button = $("<br/>" + "<button>");
-          $("#info").append(button);
+          var btnShowAllNotes = $("<br/>" + "<button>");
+          $("#info").append(button, btnShowAllNotes);
           button.html('Save');
-          // $("textarea").on('keyup change', function(e) {
-          $("button").on('click', function(e) {
+          button.attr('id', 'save_note');
+
+
+
+
+          // Save a note
+          button.on('click', function(e) {
             if (e.which == 220) return false;
             var updatedNote = {
               id: urlParams.get('id'),
@@ -86,29 +116,49 @@
               }
             });
           });
+
+          // Show all notes a tutor saved to a students
+          btnShowAllNotes.html('Show All Notes with Student');
+          btnShowAllNotes.attr('id', 'show_all');
+
+          btnShowAllNotes.on('click', function(e) {
+            alert("Show all notes given a student");
+            // show the query that returns all the Notes
+
+          });
+
         }
         else {
           // Allow student to have a option to cancel appointment
+          // make sure appointment is not within 24 hours to cancel
+          var currentMoment = new Date();
+          var scheduledApp = new Date(data.success[0].date.slice(0,11) + data.success[0].start_time);
           var button = $("<br/>" + "<button>");
+          button.attr('id', 'cancel_appointment');
           $("#info").append(button);
           button.html('Cancel Appointment');
           $("button").on('click', function(e) {
-            var appt_id = {
-              id: urlParams.get('id')
-            }
-
-            $.ajax({
-              type: 'post',
-              url: 'cancel_appointment',
-              data: appt_id,
-              success: function(resp) {
-                alert("Are you sure you want to Cancel the Appointment?")
-                location.assign("tutor_view");
-              },
-              error: function(jqXHR, textStatus, errorThrown) {
-                console.log(textStatus, errorThrown);
+            if ((currentMoment.getTime() - scheduledApp.getTime()) > 86400000) { // 86400000 = 24 hours
+              var appt_id = {
+                id: urlParams.get('id')
               }
-            });
+
+              $.ajax({
+                type: 'post',
+                url: 'cancel_appointment',
+                data: appt_id,
+                success: function(resp) {
+                  alert("Are you sure you want to Cancel the Appointment?")
+                  location.assign("tutor_view");
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                  console.log(textStatus, errorThrown);
+                }
+              });
+            }
+            else {
+              alert("Cannot cancel appointment if appointment is within 24 hours")
+            }
           });
         }
       },
@@ -129,6 +179,9 @@
   <span class="appt_item">Course Code:  <p id="course_code" style="display:inline;"></p></span> <br>
   <span class="appt_item">Course Name:  <p id="course_name" style="display:inline;"></p></span> <br>
   <span class="appt_item">Student Notes:  <p id="notes" style="display:inline;"></p></span> <br>
+</div>
+
+<div class="container" id="extra_info">
 </div>
 
 {{else}}

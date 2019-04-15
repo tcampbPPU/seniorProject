@@ -56,8 +56,8 @@
           console.log("no data returned");
         }
       },
-      error: function() {
-        console.log("Error");
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
       }
     });
 
@@ -81,8 +81,8 @@
           console.log("no data returned");
         }
       },
-      error: function() {
-        console.log("Error");
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
       }
     });
 
@@ -97,7 +97,7 @@
         editable: false,
         selectable: false,
         selectHelper: false,
-        weekends: false,
+        weekends: true,
         height: 800,
         minTime: "07:00:00",
         maxTime: "21:00:00",

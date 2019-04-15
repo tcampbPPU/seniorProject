@@ -20,7 +20,6 @@ app.set("view engine", "handlebars");
 app.set('port', process.env.PORT || credentials.port || 3000);
 
 
-
 // Authentication
 app.use(function(req, res, next) {
   if (!credentials.authentication || req.get("X-Authentication-Key") === credentials.authentication.key) {
@@ -90,13 +89,11 @@ function connect(cb) {
 
 /*
 Not storing users Passwords
-
 var genRandomString = function(length) {
     return crypto.randomBytes(Math.ceil(length/2))
             .toString('hex') // converts to hexadecimal format
             .slice(0,length);   // returns required number of characters
 };
-
 var sha512 = function(password, salt){
     var hash = crypto.createHmac('sha512', salt);
     hash.update(password);
@@ -180,6 +177,7 @@ app.get('/view_appointment', function(req, res) {
   });
 });
 
+
 app.get('/modify_schedule', function(req, res) {
   if(req.session.is_tutor) {
     res.render('modify_schedule', {
@@ -193,7 +191,6 @@ app.get('/modify_schedule', function(req, res) {
     res.redirect(303, ".");
   }
 });
-
 
 
 
@@ -292,15 +289,8 @@ app.post("/find_tutor", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-
-      // add front end changes
-      var courseName = req.body.course_name + " ";
-
-      var courseCode = req.body.course_code;
-      // CMPS 480 = target
-      var course = courseName.concat(courseCode);
-      console.log(course);
-      var query = "select schedule.id as schedule_id, schedule.tutor_id, schedule.date as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start limit 1";
+      var course = req.body.course_search;
+      var query = "select schedule.id as schedule_id, schedule.tutor_id, CAST(schedule.date AS char) as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start";
       var value = [course];
       try {
         con.query(query, value, function (err, schedule_result, fields) {
@@ -350,6 +340,7 @@ function buildOutput(schedule, appt) {
   // sort by date, start time
   appt = _.sortBy(appt, ['date', 'start']);
 
+
   // store output
   var data = [];
 
@@ -370,6 +361,9 @@ function buildOutput(schedule, appt) {
   // end of tutor shift, converted into MS
   var schedule_end_time = new Date(schedDate +"T"+ schedule[0].end).getTime();
 
+  // Current Time in MS
+  var cur_moment = new Date().getTime();
+
   // loop over appoitments
   for (var i = 0; i < appt.length; i++) {
 
@@ -377,52 +371,49 @@ function buildOutput(schedule, appt) {
     var apptDate = appt[i].date.slice(0, 11);
 
 
-
-
     // each appointment start time in MS
-     var apptStartTimeMS = new Date(apptDate +"T"+ appt[i].start).getTime();
+    var apptStartTimeMS = new Date(apptDate +"T"+ appt[i].start).getTime();
 
     // each appointment end time in MS
-     var apptEndTimeMS = new Date(apptDate +"T"+ appt[i].end).getTime();
+    var apptEndTimeMS = new Date(apptDate +"T"+ appt[i].end).getTime();
 
     for (var j = 0; j < (apptStartTimeMS - last_end_time) / 1800000; j++) {
       var intervalStart = last_end_time + j * 1800000;
+
       // console.log("start", msToTime(intervalStart));
       var intervalEnd = last_end_time + (j + 1) * 1800000;
       // console.log("end", msToTime(intervalEnd));
 
-      //if (last_end_time != intervalStart) {
+      if (intervalStart >= cur_moment) {
         data.push({
-               schedule_id: schedule[0].schedule_id,
-        tutor_id: schedule[0].tutor_id,
-        course_id: schedule[0].course_id,
-        date: schedule[0].date,
+          schedule_id: schedule[0].schedule_id,
+          tutor_id: schedule[0].tutor_id,
+          course_id: schedule[0].course_id,
+          date: schedule[0].date,
           start: msToTime(intervalStart),
           end: msToTime(intervalEnd)
         });
-      //}
+      }
       // Assign the appt_end to last_end_time
-
     }
     last_end_time = apptEndTimeMS;
   }
 
-// Need to add time invervals until the end of the shift
+  // Need to add time invervals until the end of the shift
   for (var j = 0; j < (schedule_end_time - last_end_time) / 1800000; j++) {
     var intervalStart = last_end_time + j * 1800000;
 
     var intervalEnd = last_end_time + (j + 1) * 1800000;
-
-    data.push({
-      schedule_id: schedule[0].schedule_id,
-      tutor_id: schedule[0].tutor_id,
-      course_id: schedule[0].course_id,
-      date: schedule[0].date,
-      start: msToTime(intervalStart),
-      end: msToTime(intervalEnd)
-    });
-
-
+    if (intervalStart >= cur_moment) {
+      data.push({
+        schedule_id: schedule[0].schedule_id,
+        tutor_id: schedule[0].tutor_id,
+        course_id: schedule[0].course_id,
+        date: schedule[0].date,
+        start: msToTime(intervalStart),
+        end: msToTime(intervalEnd)
+      });
+    }
   }
   // print output
   return data;
@@ -547,7 +538,6 @@ app.post("/update_tutor_note", function(req, res) {
             console.log(err);
             res.send({success: false});
           }else {
-            console.log(result);
             res.send({success: true});
           }
         });
@@ -568,22 +558,16 @@ app.post("/load_schedule", function(req, res) {
       res.redirect(303, ".");
     }else {
       var q = "select * from schedule where tutor_id = ?";
-      var values = [req.session.user_id]; // q += and where user.id = ? // and appointment.date >= now()
+      var values = [req.body.user_id];
       try {
         con.query(q, values, function (err, result, fields) {
           if (err) {
             console.log(err);
-            res.send({success:false});
+            res.send({success: false});
           }else {
-            if (result.length != 0) {
-              res.send({success: result});
-            }
-            else {
-              res.send({success: false});
-            }
+            res.send({success: result});
           }
         });
-
       } catch (err) {
         console.log(err, " Error in load_schedule.post function");
       }
@@ -676,6 +660,7 @@ app.post("/save_schedule", function(req, res) {
           }else {
             console.log(result);
             res.send({success: true});
+          // TODO: Need to insert course in to the tutor_has_course table
           }
         });
       }catch (err) {
@@ -720,6 +705,7 @@ app.post("/save_phone", function(req, res) {
         res.redirect(303, ".");
       }else {
         var phone = req.body.phone_num;
+        // phone = phone.replace(/-/g, "");
         var user_id = req.session.user_id;
         var q = "UPDATE user SET phone = ? WHERE id = ?;"
         var values = [phone, user_id];
