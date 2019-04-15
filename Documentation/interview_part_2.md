@@ -40,6 +40,30 @@
 
 
 ## Edwin
+### Jacquez (Student)
+* Has heard of but not used Point Park's tutor website. Always walked in to see a tutor.
+* Likes the website. It works, it is clean, simple and easy to use
+â*Suggested to add a tutor picture so the student knows who they are going to meet with
+â*Suggested to add color or a master theme across all pages to appeal to the use
+â*Suggested adding a list of courses to select from to avoid students typing for courses. (drop down)
+
+### Gabrielle (Student)
+* Has not heard of or used Point Park's tutor website
+* Layout is nice and seems easy to use
+â*Suggested ability to search for the site on Point Park's website.
+* Suggested adding a way to reschedule an appointment instead of making a new appointment
+
+### Samantha (Student)
+* Knows about TutorTrac but has not used it.
+â* Site is clean and easy to use
+â*Suggested a registration page where you can set your user name and password.
+*  Suggested adding ability for a new tutor to sign up to become a tutor on the main pag
+
+### Alysssa (Student)
+â*Knows about TutorTrac but has not used it.
+â*It's simple and works well without a lot of features
+â*Says this website reminds them or is similar to how you can reserve a room at the library.
+* Suggested a link for the website within Schoology.
 
 
 ## Abi
