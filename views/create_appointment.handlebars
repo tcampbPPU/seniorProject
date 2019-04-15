@@ -1,7 +1,14 @@
 <style media="screen">
-  button {
-    margin-left: 50pt;
-    margin-top: 50pt;
+
+  .form-group {
+    text-align: center;
+  }
+
+  input {
+    max-width: 20em;
+    margin: auto;
+    display: block;
+    text-align: center;
   }
 
 </style>
@@ -29,8 +36,8 @@
           console.log(data);
           location.assign("tutor_view");
         },
-        error: function() {
-          console.log("Error");
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
         }
         });
       });
@@ -41,16 +48,19 @@
   });
 
 </script>
-
-
-<div class="container-fluid">
-  <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
-  <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
+<div class="container">
+  <h2><center>Confirm Appointment</center></h2>
   <div class="form-group">
-    <label for="notes">Enter some notes...</label>
+    <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
+    <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
+  </div>
+  <!--  Note-->
+  <div class="form-group">
+   <label class="control-label " for="notes">Leave A Note</label>
     <textarea class="form-control" id="notes" rows="3" placeholder="Leave a note for your appointment..."></textarea>
+  </div>
 </div>
-</div>
+
 {{else}}
   <h1 align="center">You need to login to view this page.</h1>
 {{/if}}
