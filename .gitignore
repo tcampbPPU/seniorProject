@@ -6,3 +6,5 @@ node_modules/
 credentials.js
 # ignore mysql config
 db_config.sql
+# ignore notify.js for now
+notify.js

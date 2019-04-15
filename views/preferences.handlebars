@@ -22,7 +22,7 @@
     $('#add_phone').on('click', function() {
 
       var data = {
-        phone_num: $('#phone').val()
+        phone_num: formatPhoneNumber($('#phone').val())
       }
 
       $.ajax({
@@ -37,13 +37,22 @@
         }
       });
     });
+
+    function formatPhoneNumber(phoneNumberString) {
+      var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+      var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/)
+      if (match) {
+        return match[1] + match[2] + match[3]
+      }
+      return null
+    }
   });
 
 </script>
 <div class="container">
   <h2><center>Preferences</center></h2>
   <div class="form-group">
-    <p id="msg">Enter Phone if you would to receive notifications.</p>
+    <p id="msg">Enter phone number if you want to receive notifications.</p>
   </div>
 
   <div class="form-group">
