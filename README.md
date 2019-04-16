@@ -8,6 +8,7 @@ This application will allow students schedule an appointment with a tutor, to ge
 
 ## Usage
 ### Student
+
 1. Select Course the student seeks assistance
 2. Calendar gets presented to student with 30 minute intervals blocks where a tutor is available.
 3. Student gets directed to confirmation page where they can leave a note for their scheduled tutor.
