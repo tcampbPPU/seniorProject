@@ -28,9 +28,9 @@
 
 ### Nina (Tutor)
 * Most of the students now, if not all are drop-ins
-    - One due to the fact the current system does’t allow for them to schedule.
+    - One due to the fact the current system doesâ€™t allow for them to schedule.
     - Most students like the connivence of being able to drop-in
-* Need some type of way to have those students (drop-ins) be monitored and added to my schedule so it doesn’t appear to the students that are scheduling online  I am still available
+* Need some type of way to have those students (drop-ins) be monitored and added to my schedule so it doesnâ€™t appear to the students that are scheduling online  I am still available
 
 
 ### Nick (Student)
