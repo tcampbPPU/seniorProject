@@ -117,8 +117,11 @@ function getMenu(req) {
     if (req.session.user_id) {
       menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
     }
-    if (req.session.is_admin || req.session.is_tutor) {
+    if (req.session.is_tutor) {
       menu.push({"page": "save_schedule", "label": "Create Schedule"});
+    }
+    if (req.session.is_admin) {
+      menu.push({"page": "add_tutor", "label": "Add Tutor"});
     }
   }
   return menu;
@@ -193,9 +196,6 @@ app.get('/modify_schedule', function(req, res) {
 });
 
 
-
-
-
 app.get('/tutor_view', function(req, res) {
   res.render('tutor_view', {
     menu: getMenu(req),
@@ -205,11 +205,11 @@ app.get('/tutor_view', function(req, res) {
   });
 });
 
-/*
-// Page that shows the appointments to a tutor
-app.get('/tutor_view', function(req, res) {
+
+// Allows tutor to create schedule
+app.get('/save_schedule', function(req, res) {
   if(req.session.is_tutor) {
-    res.render('tutor_view', {
+    res.render('save_schedule', {
        menu: getMenu(req),
        admin: req.session.is_admin,
        tutor: req.session.is_tutor,
@@ -220,13 +220,12 @@ app.get('/tutor_view', function(req, res) {
     res.redirect(303, ".");
   }
 });
-*/
 
 
 // Allows tutor to create schedule
-app.get('/save_schedule', function(req, res) {
+app.get('/add_tutor', function(req, res) {
   if(req.session.is_tutor) {
-    res.render('save_schedule', {
+    res.render('add_tutor', {
        menu: getMenu(req),
        admin: req.session.is_admin,
        tutor: req.session.is_tutor,
@@ -258,7 +257,7 @@ app.post("/login", function(req, res) {
     }else {
       var user = req.body.user;
       var password = req.body.pwd;
-      var q  ="SELECT * FROM user WHERE email = ?";
+      var q  = "SELECT * FROM user WHERE email = ?";
       var values = [user];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -290,7 +289,7 @@ app.post("/find_tutor", function(req, res) {
       res.redirect(303, ".");
     }else {
       var course = req.body.course_search;
-      var query = "select schedule.id as schedule_id, schedule.tutor_id, CAST(schedule.date AS char) as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start";
+      var query = "select schedule.id as schedule_id, schedule.tutor_id, CAST(schedule.date AS char) as date, schedule.start as start, schedule.end as end, course.id as course_id from schedule left outer join tutor_has_course on schedule.tutor_id = tutor_has_course.user_id left outer join course on tutor_has_course.course_id = course.id where schedule.date >= curdate() and course.course_code = ? order by schedule.date, schedule.start limit 1";
       var value = [course];
       try {
         con.query(query, value, function (err, schedule_result, fields) {
@@ -303,11 +302,12 @@ app.post("/find_tutor", function(req, res) {
               var result1 = []; // hold our results
               for (var i = 0; i < schedule_result.length; i++) {
                 dates_to_search.push(
-                  formatDate(schedule_result[i].date.toString().slice(0,16))
+                  schedule_result[i].date
                 );
               }
               // select all the appoints given our dates
-              var appts_query = "select appointment.id as appointment_id, appointment.tutor_id, DATE_ADD(CAST( appointment.date AS char), INTERVAL 1 DAY) as date, appointment.start_time as start, appointment.end_time as end from appointment  where appointment.date in (?) order by appointment.date";
+              //var appts_query = "select appointment.id as appointment_id, appointment.tutor_id, DATE_ADD(CAST( appointment.date AS char), INTERVAL 1 DAY) as date, appointment.start_time as start, appointment.end_time as end from appointment  where appointment.date in (?) order by appointment.date";
+              var appts_query = "select appointment.id as appointment_id, appointment.tutor_id, CAST(appointment.date AS char) as date, appointment.start_time as start, appointment.end_time as end from appointment where appointment.date in (?) order by appointment.date";
               try {
                 con.query(appts_query, [dates_to_search], function(err, appts_result, fields) {
                   if (err) {
@@ -361,7 +361,6 @@ function buildOutput(schedule, appt) {
   // end of tutor shift, converted into MS
   var schedule_end_time = new Date(schedDate +"T"+ schedule[0].end).getTime();
 
-  // Current Time in MS
   var cur_moment = new Date().getTime();
 
   // loop over appoitments
@@ -372,10 +371,10 @@ function buildOutput(schedule, appt) {
 
 
     // each appointment start time in MS
-    var apptStartTimeMS = new Date(apptDate +"T"+ appt[i].start).getTime();
+     var apptStartTimeMS = new Date(apptDate +"T"+ appt[i].start).getTime();
 
     // each appointment end time in MS
-    var apptEndTimeMS = new Date(apptDate +"T"+ appt[i].end).getTime();
+     var apptEndTimeMS = new Date(apptDate +"T"+ appt[i].end).getTime();
 
     for (var j = 0; j < (apptStartTimeMS - last_end_time) / 1800000; j++) {
       var intervalStart = last_end_time + j * 1800000;
@@ -395,16 +394,17 @@ function buildOutput(schedule, appt) {
         });
       }
       // Assign the appt_end to last_end_time
+
     }
     last_end_time = apptEndTimeMS;
   }
 
-  // Need to add time invervals until the end of the shift
+// Need to add time invervals until the end of the shift
   for (var j = 0; j < (schedule_end_time - last_end_time) / 1800000; j++) {
     var intervalStart = last_end_time + j * 1800000;
 
     var intervalEnd = last_end_time + (j + 1) * 1800000;
-    if (intervalStart >= cur_moment) {
+		if (intervalStart >= cur_moment) {
       data.push({
         schedule_id: schedule[0].schedule_id,
         tutor_id: schedule[0].tutor_id,
@@ -413,7 +413,8 @@ function buildOutput(schedule, appt) {
         start: msToTime(intervalStart),
         end: msToTime(intervalEnd)
       });
-    }
+   }
+
   }
   // print output
   return data;
@@ -430,10 +431,10 @@ app.post("/load_appointments", function(req, res) {
     }else {
       if (req.session.is_tutor == 0) {
         // query for student
-        var q = "select appointment.id as appointment_id,appointment.date, appointment.start_time, appointment.end_time, appointment.location, appointment.notes, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.tutor_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.student_id = ?";
+        var q = "select appointment.id as appointment_id,appointment.date, appointment.start_time, appointment.end_time, appointment.location, appointment.notes, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.tutor_id = user.id left join course on appointment.course_id = course.id  where appointment.student_id = ?";
       }else {
         // query for tutor
-        var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
+        var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join course on appointment.course_id = course.id  where appointment.tutor_id = ?";
       }
       var values = [req.session.user_id];
       try {
@@ -493,7 +494,6 @@ app.post("/confirm_appointments", function(req, res) {
   });
 });
 
-// TODO: To handle the notes created on confirm_appointments
 
 
 app.post("/view_appts_more_detail", function(req, res) {
@@ -633,6 +633,93 @@ app.post("/update_schedule", function(req, res) {
   });
 });
 
+
+// Course ID Lookup function
+/*
+function findCourseID(course_code) {
+  var id;
+  connect(function(con) {
+    var q = "select id from course where course_code = ?"
+    try {
+      con.query(q, [course_code], function (err, result, fields) {
+        id = result[0].id;
+      });
+    }catch(err) {
+      console.log(err, " Error finding course ID.");
+    }
+  });
+  return id;
+}
+
+// console.log("Finding Course ID ", findCourseID("CMPS 480"));
+*/
+
+
+/*
+app.post("/save_schedule", function(req, res) {
+  connect(function(con) {
+      var errors = req.validationErrors();
+      if (errors) {
+        req.session.errors = errors;
+        res.redirect(303, ".");
+      }else {
+        var q = "insert into schedule (schedule.tutor_id, schedule.date, schedule.start, schedule.end) values (?, ?, ?, ?)";
+        var tutor_id = req.session.user_id;
+        var date = req.body.date;
+        var start_time = req.body.start;
+        var end_time = req.body.end;
+        var values = [tutor_id, date, start_time, end_time];
+        try {
+          // insert into schedule
+          con.query(q, values, function (err, result, fields) {
+            if (err) {
+              console.log(err);
+              res.send({success: false});
+            }else {
+              var course = req.body.course;
+              var find_q = "select id from course where course_code = ?";
+              try {
+                // Course ID lookup given a course code
+                con.query(find_q, [course], function (err, courseResult, fields) {
+                  if (err) {
+                    console.log(err);
+                    res.send({success: false});
+                  }else {
+                    // update tutor has course
+
+                    var id = courseResult[0].id;
+                    console.log(id);
+                    var course_q = "INSERT INTO tutor_has_course (user_id, course_id) VALUES (?, ?)";
+                    var course_Vals = [req.session.user_id, id];
+                    try {
+                      con.query(course_q, course_Vals, function (err, result2, fields) {
+                        if (err) {
+                          console.log(err);
+                          res.send({success: false});
+                        }else {
+                          console.log(result2);
+                          res.send({success: true});
+                        }
+                      });
+                    }catch(err) {
+                      console.log(err, " Error inserting into tutor_has_course.");
+                    }
+                  }
+                });
+              }catch (err) {
+                console.log(err, " Error Finding Course");
+              }
+            }
+          });
+        }catch (err) {
+          console.log(err, " Error entering schedule");
+        }
+      }
+  });
+});
+*/
+
+
 // Handles Saving the Tutors schedule
 app.post("/save_schedule", function(req, res) {
   connect(function(con) {
@@ -643,14 +730,10 @@ app.post("/save_schedule", function(req, res) {
     }else {
       var q = "insert into schedule (schedule.tutor_id, schedule.date, schedule.start, schedule.end) values (?, ?, ?, ?)";
       var tutor_id = req.session.user_id;
-      var course = req.body.course;
       var date = req.body.date;
       var start_time = req.body.start;
       var end_time = req.body.end;
-      // var dateElements = req.body.start_time.slice(0,10).split("/");
-      // var date = dateElements[2]+ '-' +dateElements[0]+ '-' +dateElements[1];
-      // var start_time = ConvertTimeformat(req.body.start_time.slice(11,19)) + ":00";
-      // var end_time = ConvertTimeformat(req.body.end_time.slice(11,19)) + ":00";
+      var course = req.body.course;
       var values = [tutor_id, date, start_time, end_time];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -658,9 +741,9 @@ app.post("/save_schedule", function(req, res) {
             console.log(err);
             res.send({success: false});
           }else {
+            // need to update course info...
             console.log(result);
             res.send({success: true});
-          // TODO: Need to insert course in to the tutor_has_course table
           }
         });
       }catch (err) {
@@ -698,19 +781,46 @@ app.post("/cancel_appointment", function(req, res) {
 });
 
 app.post("/save_phone", function(req, res) {
-    connect(function(con) {
-      var errors = req.validationErrors();
-      if (errors) {
-        req.session.errors = errors;
-        res.redirect(303, ".");
-      }else {
-        var phone = req.body.phone_num;
-        // phone = phone.replace(/-/g, "");
-        var user_id = req.session.user_id;
-        var q = "UPDATE user SET phone = ? WHERE id = ?;"
-        var values = [phone, user_id];
-        try {
-          con.query(q, values, function (err, result, fields) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var phone = req.body.phone_num;
+      // phone = phone.replace(/-/g, "");
+      var user_id = req.session.user_id;
+      var q = "UPDATE user SET phone = ? WHERE id = ?;"
+      var values = [phone, user_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            console.log(result);
+            res.send({success: true});
+          }
+        });
+      }catch (err) {
+        console.log(err, " Error in save_phone.post function");
+      }
+    }
+  });
+});
+
+app.post("/add_tutor", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var ppu_id = req.body.ppu_id;
+      var q = 'UPDATE user SET is_tutor = 1 WHERE ppu_id = ?';
+      var values = [ppu_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
             if (err) {
               console.log(err);
               res.send({success: false});
@@ -718,12 +828,12 @@ app.post("/save_phone", function(req, res) {
               console.log(result);
               res.send({success: true});
             }
-          });
-        }catch (err) {
-          console.log(err, " Error in save_phone.post function");
-        }
+        });
+      }catch (err) {
+        console.log(err, " Error in save_phone.post function");
       }
-    });
+    }
+  });
 });
 
 

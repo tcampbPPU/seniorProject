@@ -1,0 +1,55 @@
+<style media="screen">
+  .form-group {
+    text-align: center;
+  }
+
+  input {
+    max-width: 20em;
+    margin: auto;
+    display: block;
+    text-align: center;
+  }
+</style>
+{{#if admin}}
+<script type="text/javascript">
+  $(function () {
+    // update user to give them tutor privileges
+    $("#submit").on('click', function () {
+      var data = {
+        ppu_id: $("#ppu_id").val()
+      }
+      $.ajax({
+        type: 'post',
+        url: 'add_tutor',
+        data: data,
+        success: function(response) {
+          if (response.success == true) {
+            alert("Privileges were added to new tutor!");
+            //location.assign("tutor_view")
+          }else{
+            alert("Error");
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
+        }
+      });
+    });
+
+  });
+</script>
+<div class="container">
+  <h2><center>Add a Tutor</center></h2>
+  <div class="form-group">
+   <label class="control-label " for="ppu_id">PPU ID: </label>
+    <input class="form-control" id="ppu_id" name="ppu_id" type="text" placeholder="PPU ID"/>
+  </div>
+  <div class="form-group">
+   <div>
+    <button id="submit" class="btn btn-primary"  name="submit" type="submit">Submit</button>
+   </div>
+  </div>
+</div>
+{{else}}
+  <h1 align="center">You need to login to view this page.</h1>
+{{/if}}
