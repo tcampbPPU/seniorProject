@@ -48,8 +48,8 @@ function connect(cb) {
 function findAppts() {
   connect(function(con) {
     try {
-      //var q = "SELECT * FROM appointment left join user on  appointment.student_id = user.id WHERE start_time between TIME(NOW()) and DATE_ADD(TIME(NOW()), INTERVAL 1 HOUR)";
-      var q = "SELECT * FROM appointment left join user on  appointment.student_id = user.id WHERE 1=1 and Date('2019-04-14') = appointment.date and Time(start_time) between TIME('23:00:00') and DATE_ADD(TIME('23:00:00'), INTERVAL 30 minute)";
+      var q = "SELECT * FROM appointment left join user on  appointment.student_id = user.id left join user tutor_user on  appointment.tutor_id = tutor_user.id WHERE user.phone is not null and Date(now()) = CAST(appointment.date AS char) and Time(start_time) between DATE_SUB(TIME(now()),  INTERVAL 1 minute) and DATE_ADD(TIME(now()), INTERVAL 30 minute)";
+      // var q = "SELECT * FROM appointment left join user on  appointment.student_id = user.id WHERE user.phone is not null and Date('2019-04-14') = appointment.date and Time(start_time) between TIME('23:00:00') and DATE_ADD(TIME('23:00:00'), INTERVAL 30 minute)";
       con.query(q, function (err, result, fields) {
         if (err) {
           console.log(err);

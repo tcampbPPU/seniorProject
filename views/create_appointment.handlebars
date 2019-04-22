@@ -11,13 +11,27 @@
     text-align: center;
   }
 
+  .appt_item {
+    max-width: 35em;
+    margin: auto;
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 22px;
+    font-weight: normal;
+  }
+
 </style>
 {{#if login}}
 <script type="text/javascript">
   // Confirmation Page to create an appointment with tutor
   $(function() {
+    var urlParams = new URLSearchParams(window.location.search);
     $("#confirm").on('click', function(e) {
-      var urlParams = new URLSearchParams(window.location.search);
       var data = {
         schedule_id: urlParams.get('schedule_id'),
         course_id: urlParams.get('course_id'),
@@ -54,11 +68,18 @@
     <button id="cancel" type="button" class="btn btn-danger">Go Back</button>
     <button id="confirm" type="button" class="btn btn-primary">Confirm Appointment</button>
   </div>
+  <!--Tutors info-->
+  <!-- <span class="appt_info">Tutor Name:  <p id="name" style="display:inline;"></p></span> <br>
+  <span class="appt_info">Date:  <p id="date1" style="display:inline;"></p></span> <br> -->
+
+
+
   <!--  Note-->
   <div class="form-group">
    <label class="control-label " for="notes">Leave A Note</label>
     <textarea class="form-control" id="notes" rows="3" placeholder="Leave a note for your appointment..."></textarea>
   </div>
+
 </div>
 
 {{else}}
