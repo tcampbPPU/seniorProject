@@ -860,12 +860,37 @@ app.post("/add_tutor", function(req, res) {
               console.log(err);
               res.send({success: false});
             }else {
-              console.log(result);
               res.send({success: true});
             }
         });
       }catch (err) {
-        console.log(err, " Error in save_phone.post function");
+        console.log(err, " Error in add_tutor.post function");
+      }
+    }
+  });
+});
+
+app.post("/remove_tutor", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var ppu_id = req.body.ppu_id;
+      var q = 'UPDATE user SET is_tutor = 0 WHERE ppu_id = ?';
+      var values = [ppu_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+            if (err) {
+              console.log(err);
+              res.send({success: false});
+            }else {
+              res.send({success: true});
+            }
+        });
+      }catch (err) {
+        console.log(err, " Error in remove_tutor.post function");
       }
     }
   });
