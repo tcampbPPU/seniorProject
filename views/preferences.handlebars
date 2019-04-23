@@ -19,6 +19,26 @@
 {{#if login}}
 <script type="text/javascript">
   $(function() {
+    // render phone number to user on page load
+
+    var current_user = {
+      user_id : {{login}}
+    };
+    console.log(current_user);
+
+    $.ajax({
+      type: 'post',
+      url: 'render_phoneNum',
+      data: current_user,
+      success: function(response) {
+        // console.log(response.success[0].phone);
+        !response.success[0].phone ? "" : $("#phone").val(response.success[0].phone);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+
     $('#add_phone').on('click', function() {
 
       var data = {

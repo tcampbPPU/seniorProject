@@ -787,6 +787,34 @@ app.post("/cancel_appointment", function(req, res) {
   });
 });
 
+//render phone number on preferences pages
+
+app.post("/render_phoneNum", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var user_id = req.body.user_id;
+      var q = "select phone from user where phone is not null and id = ?";
+      var values = [user_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            res.send({success: result});
+          }
+        });
+      }catch(err) {
+        console.log(err, " Error getting existing phone number");
+      }
+    }
+  });
+})
+
 app.post("/save_phone", function(req, res) {
   connect(function(con) {
     var errors = req.validationErrors();
