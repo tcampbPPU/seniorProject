@@ -76,8 +76,8 @@
       data: data,
       success: function(data) {
         $("#date").text(data.success[0].date.slice(0,10));
-        $("#start_time").text(data.success[0].start_time);
-        $("#end_time").text(data.success[0].end_time);
+        $("#start_time").text(convert24HourTime(data.success[0].start_time));
+        $("#end_time").text(convert24HourTime(data.success[0].end_time));
         $("#notes").text(data.success[0].notes != null ? data.success[0].notes : "No Notes for this appointment.");
         $("#first_name").text(data.success[0].first_name);
         $("#last_name").text(data.success[0].last_name);
@@ -157,6 +157,7 @@
               });
             }
             else {
+              button.hide();
               alert("Cannot cancel appointment if appointment is within 24 hours")
             }
           });
@@ -166,6 +167,28 @@
         console.log("Error");
       }
     });
+
+    // converts Military time
+    function convert24HourTime(time) {
+      time = time.split(':');
+      var hours = Number(time[0]);
+      var minutes = Number(time[1]);
+
+      var timeValue;
+
+      if (hours > 0 && hours <= 12) {
+        timeValue = "" + hours;
+      }
+      else if (hours > 12) {
+        timeValue = "" + (hours - 12);
+      }
+      else if (hours == 0) {
+        timeValue = "12";
+      }
+      timeValue += (minutes < 10) ? ":0" + minutes : ":" + minutes;  // get minutes
+      timeValue += (hours >= 12) ? " PM" : " AM";  // get AM/PM
+      return timeValue;
+    }
   });
 
 </script>
