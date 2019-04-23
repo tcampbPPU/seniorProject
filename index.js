@@ -435,6 +435,7 @@ app.post("/load_appointments", function(req, res) {
       }else {
         // query for tutor
         var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join course on appointment.course_id = course.id  where appointment.tutor_id = ?";
+        // var q = "select appointment.id as appointment_id, appointment.date, appointment.start_time, appointment.end_time, appointment.location, user.first_name, user.last_name, course.course_code from appointment left outer join user on appointment.student_id = user.id left join tutor_has_course on appointment.tutor_id = tutor_has_course.user_id left join course on tutor_has_course.course_id = course.id where appointment.tutor_id = ?";
       }
       var values = [req.session.user_id];
       try {
@@ -503,7 +504,13 @@ app.post("/view_appts_more_detail", function(req, res) {
       req.session.errors = errors;
       res.redirect(303, ".");
     }else {
-      var q = "select appointment.id, appointment.date, appointment.start_time, appointment.end_time, appointment.notes, appointment.tutor_notes, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join course on appointment.course_id = course.id where appointment.id = ?";
+      if (req.session.is_tutor == 0) {
+        // query for student
+        var q = "select appointment.id, appointment.date, appointment.start_time, appointment.end_time, appointment.notes, appointment.tutor_notes, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.tutor_id = user.id left join course on appointment.course_id = course.id where appointment.id = ?";
+      }else {
+        // query for tutor
+        var q = "select appointment.id, appointment.date, appointment.start_time, appointment.end_time, appointment.notes, appointment.tutor_notes, user.first_name, user.last_name, course.course_code, course.course_name from appointment left join user on appointment.student_id = user.id left join course on appointment.course_id = course.id where appointment.id = ?";
+      }
       var values = [req.body.appointment_id];
       try {
         con.query(q, values, function (err, result, fields) {
@@ -780,6 +787,34 @@ app.post("/cancel_appointment", function(req, res) {
   });
 });
 
+//render phone number on preferences pages
+
+app.post("/render_phoneNum", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var user_id = req.body.user_id;
+      var q = "select phone from user where phone is not null and id = ?";
+      var values = [user_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+          if (err) {
+            console.log(err);
+            res.send({success: false});
+          }else {
+            res.send({success: result});
+          }
+        });
+      }catch(err) {
+        console.log(err, " Error getting existing phone number");
+      }
+    }
+  });
+})
+
 app.post("/save_phone", function(req, res) {
   connect(function(con) {
     var errors = req.validationErrors();
@@ -825,12 +860,37 @@ app.post("/add_tutor", function(req, res) {
               console.log(err);
               res.send({success: false});
             }else {
-              console.log(result);
               res.send({success: true});
             }
         });
       }catch (err) {
-        console.log(err, " Error in save_phone.post function");
+        console.log(err, " Error in add_tutor.post function");
+      }
+    }
+  });
+});
+
+app.post("/remove_tutor", function(req, res) {
+  connect(function(con) {
+    var errors = req.validationErrors();
+    if (errors) {
+      req.session.errors = errors;
+      res.redirect(303, ".");
+    }else {
+      var ppu_id = req.body.ppu_id;
+      var q = 'UPDATE user SET is_tutor = 0 WHERE ppu_id = ?';
+      var values = [ppu_id];
+      try {
+        con.query(q, values, function (err, result, fields) {
+            if (err) {
+              console.log(err);
+              res.send({success: false});
+            }else {
+              res.send({success: true});
+            }
+        });
+      }catch (err) {
+        console.log(err, " Error in remove_tutor.post function");
       }
     }
   });
