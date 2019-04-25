@@ -60,6 +60,15 @@
     border-radius: 6px;
   }
 
+  #all_notes {
+    max-width: 35em;
+    margin: auto;
+    display: block;
+    text-align: left;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
 </style>
 {{#if login}}
 <script type="text/javascript">
@@ -69,16 +78,17 @@
     var data = {
       appointment_id: urlParams.get('id')
     };
-    console.log(data.appointment_id);
+
     $.ajax({
       type: 'post',
       url: 'view_appts_more_detail',
       data: data,
       success: function(data) {
+        console.log(data);
         $("#date").text(data.success[0].date.slice(0,10));
         $("#start_time").text(convert24HourTime(data.success[0].start_time));
         $("#end_time").text(convert24HourTime(data.success[0].end_time));
-        $("#notes").text(data.success[0].notes != null ? data.success[0].notes : "No Notes for this appointment.");
+        $("#notes").text(data.success[0].notes != "" ? data.success[0].notes : "No note was left.");
         $("#first_name").text(data.success[0].first_name);
         $("#last_name").text(data.success[0].last_name);
         $("#course_code").text(data.success[0].course_code);
@@ -121,10 +131,47 @@
           btnShowAllNotes.html('Show All Notes with Student');
           btnShowAllNotes.attr('id', 'show_all');
 
+          // Show all the notes associated with a student and a course
           btnShowAllNotes.on('click', function(e) {
-            alert("Show all notes given a student");
             // show the query that returns all the Notes
+            var allNotes = {
+              user_id : data.success[0].user_id,
+              course_id : data.success[0].course_id
+            };
 
+            $.ajax({
+              type: 'post',
+              url: 'get_all_notes',
+              data: allNotes,
+              success: function(resp) {
+                // Prevents table getting built more than 1 time
+                btnShowAllNotes.prop('disabled', true);
+
+                // create table
+                var table = $("<br/>" + "<table>");
+                table.attr('id', 'all_notes');
+                $("#info").append(table);
+
+                // create table header
+                var thead = $("<thead>");
+                table.append(thead);
+                thead.append('<th> Date</th>');
+                thead.append('<th> Note</th>');
+
+                // get all the dates and notes
+                $.each(resp.success, function(i, item) {
+                    var tr = $('<tr>').append(
+                        //$('<td>').text(item.id),
+                        $('<td>').text(item.date),
+                        $('<td>').append(" "),
+                        $('<td>').text(item.tutor_notes)
+                    ).appendTo(table);
+                });
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+              }
+            });
           });
 
         }
