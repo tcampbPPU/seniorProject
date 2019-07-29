@@ -115,7 +115,7 @@ function getMenu(req) {
   else {
     menu.pop();
     if (req.session.user_id) {
-      menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"});
+      menu.push({"page": "schedule", "label": "Find Tutor"}, {"page": "tutor_view", "label": "Appointments"}, {"page": "about_view", "label": "About"});
     }
     if (req.session.is_tutor) {
       menu.push({"page": "save_schedule", "label": "Create Schedule"});
@@ -237,6 +237,15 @@ app.get('/add_tutor', function(req, res) {
   }
 });
 
+
+app.get('/about_view', function(req, res) {
+  res.render('about_view', {
+    menu: getMenu(req),
+    login: req.session.user_id ? req.session.user_id : false,
+    user_name: req.session.user_first_name,
+    tutor: req.session.is_tutor
+  });
+});
 
 
 app.get("/logout", function(req, res) {

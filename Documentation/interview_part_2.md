@@ -89,19 +89,22 @@
 * It would be great to include a menu that links to services or a portfolio possible contact us information and live chat session in case of difficulty.
 
 ## Sheree
-
 ### Lorri (student)
-* simple and easy to get around
-* instead of typing in the course to find tutor have something populated to see courses offered for tutoring
-* enjoyed the popup that displays if no tutors are available
-* have some type of instructions so students know to click on time frame
+* simple and easy to get around 
+* instead of typing in the course to find tutor have something populated to see courses offered for tutoring 
+* enjoyed the popup that displays if no tutors are available 
+* have some type of instructions so students know to click on time frame 
+
 ### Gabby (student)
 * easy to understand and work
-* like the leave a note for your appointment
-* like that you can cancel appointment
+* like the leave a note for your appointment 
+* like that you can cancel appointment 
 * limited to what the student can do makes it easy and fast to schedule appointment
+
 ### Lance (student)
-* drop down for find tutor
-* like no tutor was found pop-up so you don't have to waste time and you know right away
+* drop down for find tutor 
+* like no tutor was found pop-up so you dont have to waste time and you know right away
 * simple and understandable
-* it works
+* it works 
+
+
