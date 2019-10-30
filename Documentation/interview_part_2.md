@@ -28,9 +28,9 @@
 
 ### Nina (Tutor)
 * Most of the students now, if not all are drop-ins
-    - One due to the fact the current system does’t allow for them to schedule.
+    - One due to the fact the current system doesâ€™t allow for them to schedule.
     - Most students like the connivence of being able to drop-in
-* Need some type of way to have those students (drop-ins) be monitored and added to my schedule so it doesn’t appear to the students that are scheduling online  I am still available
+* Need some type of way to have those students (drop-ins) be monitored and added to my schedule so it doesnâ€™t appear to the students that are scheduling online  I am still available
 
 
 ### Nick (Student)
@@ -46,6 +46,7 @@
 * Suggested to add a tutor picture so the student knows who they are going to meet with
 * Suggested to add color or a master theme across all pages to appeal to the use
 * Suggested adding a list of courses to select from to avoid students typing for courses. (drop down)
+
 
 ### Gabrielle (Student)
 * Has not heard of or used Point Park's tutor website
