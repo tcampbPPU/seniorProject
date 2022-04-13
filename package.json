@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/tcampbPPU/seniorProject#readme",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "cookie-parser": "^1.4.3",
     "crypto": "^1.0.1",
     "express": "^4.16.4",
